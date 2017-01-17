@@ -32,6 +32,7 @@ parser.add_option('--ntuple', action="store", type="string", dest="ntuple", defa
 parser.add_option('--lumi', action="store", type="float", dest="lumi", default="2300")
 parser.add_option('--scalew', action="store", type="float", dest="scalew", default="1.21")
 parser.add_option('--nodata', action='store_true', dest='nodata', default=False)
+parser.add_option('--inverse', action='store_true', dest='inverse', default=False)
 #parser.add_option('--scaleTTB', action='store_true', dest='scaleTTB', default=False)
 (options, args) = parser.parse_args()
 currentDir = os.getcwd();
@@ -59,6 +60,8 @@ Scale_W_Factor_global=options.scalew;
 Scale_W_Factor_global_str=str(Scale_W_Factor_global);
 
 Scale_T_Factor_global=1.0;
+
+Scale_T_Factor_global_str=str(Scale_T_Factor_global);
        
 BulkGraviton_xsec=[0.177400,0.0331548,0.008993];
 VBF_BulkGraviton_xsec=[0.01089,0.00217,0.000655];
@@ -216,8 +219,12 @@ if (options.channel=="el" or options.channel=="em"):
   
    
     frameSubTitle_AD_string="\hspace{6pt} TTBar Control Region";
- 
-    cuts_itemize=["deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>45 && pfMET>80 && jet_tau2tau1 < 0.6 && abs(vbf_maxpt_j1_pt-vbf_maxpt_j2_pt)>0.0001 && (jet_mass_pr > 65 && jet_mass_pr < 105 ) ","vbf_maxpt_j2_bDiscriminatorCSV>0.89","vbf_maxpt_j1_bDiscriminatorCSV>0.89"]; 
+    
+    if options.inverse:
+       cuts_itemize=["deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>45 && pfMET>80 && jet_tau2tau1 < 0.6 && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>0.0001 && (jet_mass_pr > 65 && jet_mass_pr < 105 ) ","vbf_maxpt_j2_bDiscriminatorCSV>0.89","vbf_maxpt_j1_bDiscriminatorCSV>0.89"]; 
+       
+    else:
+       cuts_itemize=["deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>45 && pfMET>80 && jet_tau2tau1 < 0.6 && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>0.0001 && (jet_mass_pr > 65 && jet_mass_pr < 105 ) ","vbf_maxpt_j1_bDiscriminatorCSV>0.89","vbf_maxpt_j2_bDiscriminatorCSV>0.89"]; 
 
    
 
@@ -231,8 +238,11 @@ if (options.channel=="el" or options.channel=="em"):
 else:
  
     #frameSubTitle_AD_string="\hspace{6pt} TTBarCR";
-    frameSubTitle_AD_string="";
-    cuts_itemize=["1==1","deltaR_lak8jet>(TMath::Pi()/2.0)","TMath::Abs(deltaphi_METak8jet)>2.0","TMath::Abs(deltaphi_Vak8jet)>2.0","v_pt>200","ungroomed_jet_pt>200","l_pt>40","pfMET>40","nBTagJet_medium==0 && vbf_maxpt_j1_bDiscriminatorCSV<0.89 && vbf_maxpt_j2_bDiscriminatorCSV<0.89","jet_tau2tau1 < 0.6","njets>1","abs(vbf_maxpt_j1_pt-vbf_maxpt_j2_pt)>0.0001","(jet_mass_pr > 65 && jet_mass_pr < 105 )"]; 
+    frameSubTitle_AD_string="\hspace{6pt} TTBar Control Region";
+    if options.inverse:
+       cuts_itemize=["deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>40 && pfMET>40 && jet_tau2tau1 < 0.6 && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>0.0001 && (jet_mass_pr > 65 && jet_mass_pr < 105 )","vbf_maxpt_j2_bDiscriminatorCSV>0.89","vbf_maxpt_j1_bDiscriminatorCSV>0.89"]; 
+    else:
+       cuts_itemize=["deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>40 && pfMET>40 && jet_tau2tau1 < 0.6 && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>0.0001 && (jet_mass_pr > 65 && jet_mass_pr < 105 )","vbf_maxpt_j1_bDiscriminatorCSV>0.89","vbf_maxpt_j2_bDiscriminatorCSV>0.89"]; 
     #cuts_itemize=["1==1 && deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>40 && pfMET>40 && nBTagJet_medium==0 && vbf_maxpt_j1_bDiscriminatorCSV<0.89 && vbf_maxpt_j2_bDiscriminatorCSV<0.89 && jet_tau2tau1 < 0.6 && njets>1 && abs(vbf_maxpt_j1_pt-vbf_maxpt_j2_pt)>0.0001 && (jet_mass_pr > 65 && jet_mass_pr < 105 )"];
     
 
@@ -1081,7 +1091,7 @@ def latex_graph_include(Sample_gi,Mass_gi,ScaleFactor_gi,ofile_gi,FrameSubTitle_
     ofile_gi.write("\end{figure}\n");
     
 
-
+    ofile_gi.write("\\framebreak\n");
     ofile_gi.write("\setcounter{subfigure}{0}\n");
     ofile_gi.write("\\begin{figure}[h]\n");
     ofile_gi.write("\\begin{center}\n");
@@ -1093,7 +1103,7 @@ def latex_graph_include(Sample_gi,Mass_gi,ScaleFactor_gi,ofile_gi,FrameSubTitle_
     ofile_gi.write("\end{center}\n");
     ofile_gi.write("\end{figure}\n");
 
-
+    ofile_gi.write("\\framebreak\n");
     ofile_gi.write("\setcounter{subfigure}{0}\n");
     ofile_gi.write("\\begin{figure}[h]\n");
     ofile_gi.write("\\begin{center}\n");
@@ -1108,7 +1118,7 @@ def latex_graph_include(Sample_gi,Mass_gi,ScaleFactor_gi,ofile_gi,FrameSubTitle_
 
 
 
-
+    ofile_gi.write("\\framebreak\n");
     ofile_gi.write("\setcounter{subfigure}{0}\n");
     ofile_gi.write("\\begin{figure}[h]\n");
     ofile_gi.write("\\begin{center}\n");
@@ -1120,7 +1130,7 @@ def latex_graph_include(Sample_gi,Mass_gi,ScaleFactor_gi,ofile_gi,FrameSubTitle_
     ofile_gi.write("\end{center}\n");
     ofile_gi.write("\end{figure}\n");
 
-
+    ofile_gi.write("\\framebreak\n");
     ofile_gi.write("\setcounter{subfigure}{0}\n");
     ofile_gi.write("\\begin{figure}[h]\n");
     ofile_gi.write("\\begin{center}\n");
@@ -1132,7 +1142,7 @@ def latex_graph_include(Sample_gi,Mass_gi,ScaleFactor_gi,ofile_gi,FrameSubTitle_
     ofile_gi.write("\end{center}\n");
     ofile_gi.write("\end{figure}\n");
 
-
+    ofile_gi.write("\\framebreak\n");
     ofile_gi.write("\setcounter{subfigure}{0}\n");
     ofile_gi.write("\\begin{figure}[h]\n");
     ofile_gi.write("\\begin{center}\n");
@@ -1149,7 +1159,7 @@ def latex_graph_include(Sample_gi,Mass_gi,ScaleFactor_gi,ofile_gi,FrameSubTitle_
 
 
 
-
+    ofile_gi.write("\\framebreak\n");
     ofile_gi.write("\setcounter{subfigure}{0}\n");
     ofile_gi.write("\\begin{figure}[h]\n");
     ofile_gi.write("\\begin{center}\n");
@@ -1162,7 +1172,7 @@ def latex_graph_include(Sample_gi,Mass_gi,ScaleFactor_gi,ofile_gi,FrameSubTitle_
     ofile_gi.write("\end{figure}\n");
     
     
-    
+    ofile_gi.write("\\framebreak\n");
     ofile_gi.write("\setcounter{subfigure}{0}\n");
     ofile_gi.write("\\begin{figure}[h]\n");
     ofile_gi.write("\\begin{center}\n");
@@ -1174,6 +1184,8 @@ def latex_graph_include(Sample_gi,Mass_gi,ScaleFactor_gi,ofile_gi,FrameSubTitle_
     ofile_gi.write("\end{center}\n");
     ofile_gi.write("\end{figure}\n");
     
+    
+    ofile_gi.write("\\framebreak\n");
     ofile_gi.write("\setcounter{subfigure}{0}\n");
     ofile_gi.write("\\begin{figure}[h]\n");
     ofile_gi.write("\\begin{center}\n");
@@ -1186,7 +1198,7 @@ def latex_graph_include(Sample_gi,Mass_gi,ScaleFactor_gi,ofile_gi,FrameSubTitle_
     ofile_gi.write("\end{figure}\n");
     
     
-    
+    ofile_gi.write("\\framebreak\n");
     ofile_gi.write("\setcounter{subfigure}{0}\n");
     ofile_gi.write("\\begin{figure}[h]\n");
     ofile_gi.write("\\begin{center}\n");
@@ -1200,7 +1212,7 @@ def latex_graph_include(Sample_gi,Mass_gi,ScaleFactor_gi,ofile_gi,FrameSubTitle_
     
     
     
-    
+    ofile_gi.write("\\framebreak\n");
     ofile_gi.write("\setcounter{subfigure}{0}\n");
     ofile_gi.write("\\begin{figure}[h]\n");
     ofile_gi.write("\\begin{center}\n");
@@ -1213,7 +1225,7 @@ def latex_graph_include(Sample_gi,Mass_gi,ScaleFactor_gi,ofile_gi,FrameSubTitle_
     ofile_gi.write("\end{figure}\n");
     
   
-    
+    ofile_gi.write("\\framebreak\n");
     ofile_gi.write("\setcounter{subfigure}{0}\n");
     ofile_gi.write("\\begin{figure}[h]\n");
     ofile_gi.write("\\begin{center}\n");
@@ -1226,7 +1238,7 @@ def latex_graph_include(Sample_gi,Mass_gi,ScaleFactor_gi,ofile_gi,FrameSubTitle_
     ofile_gi.write("\end{figure}\n");
     
     
-    
+    ofile_gi.write("\\framebreak\n");
     ofile_gi.write("\setcounter{subfigure}{0}\n");
     ofile_gi.write("\\begin{figure}[h]\n");
     ofile_gi.write("\\begin{center}\n");
@@ -1334,7 +1346,11 @@ if __name__ == '__main__':
            pd4b = subprocess.Popen(['mkdir',ControlP_Dir_2]);
            pd4b.wait(); 
     
-    ControlP_Dir_3=ControlP_Dir_2+"/TTBarCR";
+    if options.inverse:
+       ordering="21";
+    else:
+       ordering="12";
+    ControlP_Dir_3=ControlP_Dir_2+"/TTBarCR_%s"%ordering;
     if not os.path.isdir(ControlP_Dir_3):
            pd4b = subprocess.Popen(['mkdir',ControlP_Dir_3]);
            pd4b.wait();
@@ -1467,90 +1483,90 @@ if __name__ == '__main__':
     Output_VariableList_mm.write("############################################################################\n");
     Output_VariableList_mm.write("##  Variable						Nbin		Min		Max			Label\n");
     Output_VariableList_mm.write("############################################################################\n");
-    Output_VariableList_mm.write("# l_pt							50			0		1000		pT_{l}_(GeV)\n");
+    Output_VariableList_mm.write("l_pt							50			0		1000		pT_{l}_(GeV)\n");
     Output_VariableList_mm.write("# nPV								25			0		50			nPV\n");
-    Output_VariableList_mm.write("#l_pt							25			0		500			pT_{l}_(GeV)\n");
-    Output_VariableList_mm.write("#l_eta							25			-2.5	2.5			#eta_{l}\n");
+    Output_VariableList_mm.write("# l_pt							25			0		500			pT_{l}_(GeV)\n");
+    Output_VariableList_mm.write("# l_eta							25			-2.5	2.5			#eta_{l}\n");
     Output_VariableList_mm.write("# l_eta							20			-2.5	2.5			#eta_{l}\n");
-    Output_VariableList_mm.write("#l_phi							30			-3.14	3.14		#phi_{l}\n");
-    Output_VariableList_mm.write("#v_pt							25			200		700			pT^{W}_{l}_(GeV)\n");
+    Output_VariableList_mm.write("# l_phi							30			-3.14	3.14		#phi_{l}\n");
+    Output_VariableList_mm.write("v_pt							25			200		700			pT^{W}_{l}_(GeV)\n");
     Output_VariableList_mm.write("#v_mt								20			0		400			mT^{W}_{l}_(GeV)\n");
     Output_VariableList_mm.write("# pfMET							28			0		560			MET[GeV]\n");
     Output_VariableList_mm.write("# pfMETpuppi						28			0		560			MET[GeV]\n");
-    Output_VariableList_mm.write("# pfMET							50      0       1000      MET[GeV]\n");
+    Output_VariableList_mm.write("pfMET							50      0       1000      MET[GeV]\n");
     Output_VariableList_mm.write("# pfMETpuppi_Phi					20   -3.15      3.15	  #phi_{Puppi MET}\n");
     Output_VariableList_mm.write("# pfMET_Phi						30   -3.14      3.14	  #phi_{MET}\n");
-    Output_VariableList_mm.write("#ungroomed_jet_pt				32    100       740      pT^{AK8}_(GeV)\n");
-    Output_VariableList_mm.write("# ungroomed_jet_eta				25    -2.5      2.5        #eta^{AK8}\n");
+    Output_VariableList_mm.write("ungroomed_jet_pt				32    100       740      pT^{AK8}_(GeV)\n");
+    Output_VariableList_mm.write("ungroomed_jet_eta				25    -2.5      2.5        #eta^{AK8}\n");
     Output_VariableList_mm.write("# ungroomed_jet_phi				30    -3.14     3.14     #phi^{AK8}\n");
     Output_VariableList_mm.write("# ungroomed_PuppiAK8_jet_pt		32    100       740      pT^{puppi AK8}_(GeV)\n");
     Output_VariableList_mm.write("# ungroomed_PuppiAK8_jet_eta		25    -2.5      2.5        #eta^{puppi AK8}\n");
     Output_VariableList_mm.write("# ungroomed_PuppiAK8_jet_phi		30    -3.14     3.14     #phi^{puppi AK8}\n");
-    Output_VariableList_mm.write("#jet_mass_pr						15      65       105     Jet_Pruned_Mass_(GeV/c^{2})\n");
+    Output_VariableList_mm.write("jet_mass_pr						15      65       105     Jet_Pruned_Mass_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# jet_mass_pr						22      40       150    Jet_Pruned_Mass_(GeV)\n");
     Output_VariableList_mm.write("# jet_mass_so						22      40       150    Jet_Softdrop_Mass_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# PuppiAK8_jet_mass_pr			22      40       150    puppiAK8_Jet_Pruned_Mass_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# PuppiAK8_jet_mass_so			22      40       150    puppiAK8_Jet_Softdrop_Mass_(GeV/c^{2})\n");
-    Output_VariableList_mm.write("#mass_lvj_type0					40    0       3000    M_{WW}_(GeV/c^{2})\n");
-    Output_VariableList_mm.write("#mass_lvj_type2					40    0       3000    M_{WW}_(GeV/c^{2})\n");
+    Output_VariableList_mm.write("# mass_lvj_type0					40    0       3000    M_{WW}_(GeV/c^{2})\n");
+    Output_VariableList_mm.write("# mass_lvj_type2					40    0       3000    M_{WW}_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# mass_lvj_type0_PuppiAK8			40    0       3000    M_{WW}_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# mass_lvj_type2_PuppiAK8			40    0       3000    M_{WW}_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# mass_lvj_type0_met				56    200       3000    M_{WW}_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# mass_lvj_type2_met				56    200       3000    M_{WW}_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# nu_pz_type0						30   -500      500        pZ^{#nu}[GeV]\n");
     Output_VariableList_mm.write("# nu_pz_type2                   30   -500      500        pZ^{#nu}[GeV]\n");
-    Output_VariableList_mm.write("#nu_pz_type0_met                   60   -500      500        pZ^{#nu}[GeV]\n");
-    Output_VariableList_mm.write("#nu_pz_type2_met                   60   -500      500        pZ^{#nu}[GeV]\n");
-    Output_VariableList_mm.write("#nbjets_csvl_veto                  5      0       5        N_{bjet}^{csvl}\n");
-    Output_VariableList_mm.write("#nbjets_csvm_veto                  5      0       5        N_{bjet}^{csvm}\n");
-    Output_VariableList_mm.write("#nbjets_csvt_veto                  5      0       5        N_{bjet}^{csvt}\n");
-    Output_VariableList_mm.write("#numberJetBin                      5      0       5        N_{jets}\n");
-    Output_VariableList_mm.write("#jet_tau2tau1                     25     0.      1.       #tau_{2}/#tau_{1}\n");
+    Output_VariableList_mm.write("# nu_pz_type0_met                   60   -500      500        pZ^{#nu}[GeV]\n");
+    Output_VariableList_mm.write("# nu_pz_type2_met                   60   -500      500        pZ^{#nu}[GeV]\n");
+    Output_VariableList_mm.write("# nbjets_csvl_veto                  5      0       5        N_{bjet}^{csvl}\n");
+    Output_VariableList_mm.write("# nbjets_csvm_veto                  5      0       5        N_{bjet}^{csvm}\n");
+    Output_VariableList_mm.write("# nbjets_csvt_veto                  5      0       5        N_{bjet}^{csvt}\n");
+    Output_VariableList_mm.write("# numberJetBin                      5      0       5        N_{jets}\n");
+    Output_VariableList_mm.write("jet_tau2tau1                     25     0.      1.       #tau_{2}/#tau_{1}\n");
     Output_VariableList_mm.write("# PuppiAK8_jet_tau2tau1                     25     0.      1.       puppiAK8_#tau_{2}/#tau_{1}\n");
-    Output_VariableList_mm.write("#jet2_pt				 25	0	500	 pT^{AK4}_{1}_(GeV)\n");
-    Output_VariableList_mm.write("#jet2_btag				 25	0	1	 btag^{AK4}_{1}_(GeV)\n");
-    Output_VariableList_mm.write("#jet3_pt				 25	0	500	 pT^{AK4}_{1}_(GeV)\n");
-    Output_VariableList_mm.write("#jet3_btag				 25	0	1	 btag^{AK4}_{1}_(GeV)\n");
-    Output_VariableList_mm.write("#jet_tau2tau1_exkT                30     0.1      1.      #tau_{2}/#tau_{1}_extkT\n");
-    Output_VariableList_mm.write("#jet_tau2tau1_pr                  30     0.1      1.      #tau_{2}/#tau_{1}_pruned\n");
-    Output_VariableList_mm.write("#jet_massdrop_pr                  35     0.1      1.      Pruned_Mass_Drop_(GeV/c^{2})\n");
-    Output_VariableList_mm.write("#jet_qjetvol                      35     0        1.         QjetVolatility\n");
-    Output_VariableList_mm.write("#jet_charge                       50     -2.5     2.5       Jet_Charge\n");
-    Output_VariableList_mm.write("#jet_charge_k05                       50     -2.0     2.0       Jet_Charge_k05\n");
-    Output_VariableList_mm.write("#jet_charge_k07                       50     -1.5     1.5       Jet_Charge_k07\n");
-    Output_VariableList_mm.write("#jet_charge_k10                       45     -0.8     0.8       Jet_Charge_k10\n");
-    Output_VariableList_mm.write("#jet_GeneralizedECF                   35     0.     0.6       Jet_Generalized_ECF\n");
-    Output_VariableList_mm.write("#ttb_ca8_mass_pr                   25      40      130      Jet_Pruned_Mass_(GeV/c^{2})\n");
-    Output_VariableList_mm.write("#ttb_ht                            35     0      700       \n");
-    Output_VariableList_mm.write("#ttb_ca8_ungroomed_pt              30   200      600       pT^{AK8}[GeV]\n");
-    Output_VariableList_mm.write("#ttb_ca8_tau2tau1_exkT             30    0.1      1.0      #tau_{2}/#tau_{1}_exkT\n");
-    Output_VariableList_mm.write("#ttb_ca8_tau2tau1_pr               30    0.1      1.0       #tau_{2}/#tau_{1}_pruned\n");
-    Output_VariableList_mm.write("#ttb_ca8_tau2tau1                  30    0.1      1.0       #tau_{2}/#tau_{1}\n");
-    Output_VariableList_mm.write("#ttb_ca8_charge                    50     -2.5     2.5       Jet_Charge\n");
-    Output_VariableList_mm.write("#ttb_ca8_charge_k05                50     -2.0     2.0       Jet_Charge_k05\n");
-    Output_VariableList_mm.write("#ttb_ca8_charge_k07                50     -1.5     1.5       Jet_Charge_k07\n");
-    Output_VariableList_mm.write("#ttb_ca8_charge_k10                45     -0.8     0.8       Jet_Charge_k10\n");
-    Output_VariableList_mm.write("#ttb_ca8_GeneralizedECF            30     0.     0.5       Jet_Generalized_ECF\n");
-    Output_VariableList_mm.write("#ttb_ca8_mu                        20    0.1      0.7       Pruned_Mass_Drop_(GeV/c^{2})\n");
-    Output_VariableList_mm.write("#ttb_mlvj                          40   400     1400       M_{WW}(GeV/c^{2})\n");
-    Output_VariableList_mm.write("#vbf_maxpt_j1_bDiscriminatorCSV  50      0       1          j1_bDiscriminator\n");
-    Output_VariableList_mm.write("#vbf_maxpt_j1_eta                50      -5      5          #eta_{j1}\n");
-    Output_VariableList_mm.write("#vbf_maxpt_j1_pt                 50      0       300        pT_{j1}_(GeV)\n");
-    Output_VariableList_mm.write("#vbf_maxpt_j1_QGLikelihood       50      0       1          j1_QGLikelihood\n");
-    Output_VariableList_mm.write("#vbf_maxpt_j2_bDiscriminatorCSV  50      0       1          j2_bDiscriminator\n");
-    Output_VariableList_mm.write("#vbf_maxpt_j2_eta                50      -5      5          #eta_{j2}\n");
-    Output_VariableList_mm.write("#vbf_maxpt_j2_pt                 50      0       300        pT_{j2}_(GeV)\n");
-    Output_VariableList_mm.write("#vbf_maxpt_j2_QGLikelihood       50      0       1          j2_QGLikelihood\n");
+    Output_VariableList_mm.write("# jet2_pt				 25	0	500	 pT^{AK4}_{1}_(GeV)\n");
+    Output_VariableList_mm.write("# jet2_btag				 25	0	1	 btag^{AK4}_{1}_(GeV)\n");
+    Output_VariableList_mm.write("# jet3_pt				 25	0	500	 pT^{AK4}_{1}_(GeV)\n");
+    Output_VariableList_mm.write("# jet3_btag				 25	0	1	 btag^{AK4}_{1}_(GeV)\n");
+    Output_VariableList_mm.write("# jet_tau2tau1_exkT                30     0.1      1.      #tau_{2}/#tau_{1}_extkT\n");
+    Output_VariableList_mm.write("# jet_tau2tau1_pr                  30     0.1      1.      #tau_{2}/#tau_{1}_pruned\n");
+    Output_VariableList_mm.write("# jet_massdrop_pr                  35     0.1      1.      Pruned_Mass_Drop_(GeV/c^{2})\n");
+    Output_VariableList_mm.write("# jet_qjetvol                      35     0        1.         QjetVolatility\n");
+    Output_VariableList_mm.write("# jet_charge                       50     -2.5     2.5       Jet_Charge\n");
+    Output_VariableList_mm.write("# jet_charge_k05                       50     -2.0     2.0       Jet_Charge_k05\n");
+    Output_VariableList_mm.write("# jet_charge_k07                       50     -1.5     1.5       Jet_Charge_k07\n");
+    Output_VariableList_mm.write("# jet_charge_k10                       45     -0.8     0.8       Jet_Charge_k10\n");
+    Output_VariableList_mm.write("# jet_GeneralizedECF                   35     0.     0.6       Jet_Generalized_ECF\n");
+    Output_VariableList_mm.write("# ttb_ca8_mass_pr                   25      40      130      Jet_Pruned_Mass_(GeV/c^{2})\n");
+    Output_VariableList_mm.write("# ttb_ht                            35     0      700       \n");
+    Output_VariableList_mm.write("# ttb_ca8_ungroomed_pt              30   200      600       pT^{AK8}[GeV]\n");
+    Output_VariableList_mm.write("# ttb_ca8_tau2tau1_exkT             30    0.1      1.0      #tau_{2}/#tau_{1}_exkT\n");
+    Output_VariableList_mm.write("# ttb_ca8_tau2tau1_pr               30    0.1      1.0       #tau_{2}/#tau_{1}_pruned\n");
+    Output_VariableList_mm.write("# ttb_ca8_tau2tau1                  30    0.1      1.0       #tau_{2}/#tau_{1}\n");
+    Output_VariableList_mm.write("# ttb_ca8_charge                    50     -2.5     2.5       Jet_Charge\n");
+    Output_VariableList_mm.write("# ttb_ca8_charge_k05                50     -2.0     2.0       Jet_Charge_k05\n");
+    Output_VariableList_mm.write("# ttb_ca8_charge_k07                50     -1.5     1.5       Jet_Charge_k07\n");
+    Output_VariableList_mm.write("# ttb_ca8_charge_k10                45     -0.8     0.8       Jet_Charge_k10\n");
+    Output_VariableList_mm.write("# ttb_ca8_GeneralizedECF            30     0.     0.5       Jet_Generalized_ECF\n");
+    Output_VariableList_mm.write("# ttb_ca8_mu                        20    0.1      0.7       Pruned_Mass_Drop_(GeV/c^{2})\n");
+    Output_VariableList_mm.write("# ttb_mlvj                          40   400     1400       M_{WW}(GeV/c^{2})\n");
+    Output_VariableList_mm.write("vbf_maxpt_j1_bDiscriminatorCSV  50      0       1          j1_bDiscriminator\n");
+    Output_VariableList_mm.write("vbf_maxpt_j1_eta                50      -5      5          #eta_{j1}\n");
+    Output_VariableList_mm.write("vbf_maxpt_j1_pt                 50      0       300        pT_{j1}_(GeV)\n");
+    Output_VariableList_mm.write("# vbf_maxpt_j1_QGLikelihood       50      0       1          j1_QGLikelihood\n");
+    Output_VariableList_mm.write("vbf_maxpt_j2_bDiscriminatorCSV  50      0       1          j2_bDiscriminator\n");
+    Output_VariableList_mm.write("vbf_maxpt_j2_eta                50      -5      5          #eta_{j2}\n");
+    Output_VariableList_mm.write("vbf_maxpt_j2_pt                 50      0       300        pT_{j2}_(GeV)\n");
+    Output_VariableList_mm.write("# vbf_maxpt_j2_QGLikelihood       50      0       1          j2_QGLikelihood\n");
     Output_VariableList_mm.write("abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) 35    0       9     #Delta#eta_{jj}\n");
-    Output_VariableList_mm.write("#vbf_maxpt_jj_m                  40      0       1500        M_{jj}_(GeV/c^{2})\n");
+    Output_VariableList_mm.write("vbf_maxpt_jj_m                  40      0       1500        M_{jj}_(GeV/c^{2})\n");
     Output_VariableList_mm.write("#vbf_maxpt_jj_phi                50      -3.14   3.14       #phi_{jj}\n");
-    Output_VariableList_mm.write("#vbf_maxpt_jj_eta                30      -4.7       4.7     #eta_{jj}\n");
-    Output_VariableList_mm.write("#mass_ungroomedjet_closerjet      30      80     400         M_{top}^{had}\n");
-    Output_VariableList_mm.write("#mass_leptonic_closerjet          30      100     400   	    M_{top}^{lep}\n");
+    Output_VariableList_mm.write("vbf_maxpt_jj_eta                30      -4.7       4.7     #eta_{jj}\n");
+    Output_VariableList_mm.write("# mass_ungroomedjet_closerjet      30      80     400         M_{top}^{had}\n");
+    Output_VariableList_mm.write("# mass_leptonic_closerjet          30      100     400   	    M_{top}^{lep}\n");
     Output_VariableList_mm.write("#jet_tau2tau1                    30       0.1       1.0          #tau_{2}/#tau_{1}\n");
-    Output_VariableList_mm.write("#deltaR_lak8jet                 30        0.1       5          #DeltaR\n");
-    Output_VariableList_mm.write("#deltaphi_METak8jet             30			-3.14	3.14		#Delta#phi_{met}\n");
-    Output_VariableList_mm.write("#deltaphi_Vak8jet               30			-3.14	3.14		#Delta#phi_{Wlep}\n");
+    Output_VariableList_mm.write("deltaR_lak8jet                 50        0.1       5          #DeltaR\n");
+    Output_VariableList_mm.write("deltaphi_METak8jet             50			-3.14	3.14		#Delta#phi_{met}\n");
+    Output_VariableList_mm.write("deltaphi_Vak8jet               50			-3.14	3.14		#Delta#phi_{Wlep}\n");
     
     Output_VariableList_mm.close();
     # Make InputFile and SampleListFile
@@ -1973,17 +1989,17 @@ if __name__ == '__main__':
     for nsample in range(Sample_Total_Number_mm):
         
         latex_FrameTitle="Basic Cuts Only";
-        Output_Beamer_Latex_File_mm.write("\graphicspath{{/home/matteo/Tesi/LxPlus_Matteo/ControlPlots/13gen/ControlPlots/ScaleW%s/Consecutive_Cuts_%.0f/}}\n"%(Scale_W_Factor_global_str,(Cuts_Total_Number_mm-2)));
+        Output_Beamer_Latex_File_mm.write("\graphicspath{{/home/matteo/Tesi/LxPlus_Matteo/ControlPlots/17gen/TTBarCR_%s/ScaleW%s_ScaleT%s/Consecutive_Cuts_%.0f/}}\n"%(ordering,Scale_W_Factor_global_str,Scale_T_Factor_global_str,(Cuts_Total_Number_mm-2)));
         latex_graph_include(sampleValue[nsample][0],sampleValue[nsample][2],sampleValue[nsample][5],Output_Beamer_Latex_File_mm,latex_FrameSubtitle,latex_FrameTitle);
         
         
         latex_FrameTitle="Basic Cuts and ONE b-Tagging";
-        Output_Beamer_Latex_File_mm.write("\graphicspath{{/home/matteo/Tesi/LxPlus_Matteo/ControlPlots/13gen/ControlPlots/ScaleW%s/Consecutive_Cuts_%.0f/}}\n"%(Scale_W_Factor_global_str,(Cuts_Total_Number_mm-1)));
+        Output_Beamer_Latex_File_mm.write("\graphicspath{{/home/matteo/Tesi/LxPlus_Matteo/ControlPlots/17gen/TTBarCR_%s/ScaleW%s_ScaleT%s/Consecutive_Cuts_%.0f/}}\n"%(ordering,Scale_W_Factor_global_str,Scale_T_Factor_global_str,(Cuts_Total_Number_mm-1)));
         latex_graph_include(sampleValue[nsample][0],sampleValue[nsample][2],sampleValue[nsample][5],Output_Beamer_Latex_File_mm,latex_FrameSubtitle,latex_FrameTitle);
         
         
         latex_FrameTitle="Basic Cuts and TWO b-Tagging";
-        Output_Beamer_Latex_File_mm.write("\graphicspath{{/home/matteo/Tesi/LxPlus_Matteo/ControlPlots/13gen/ControlPlots/ScaleW%s/Consecutive_Cuts_%.0f/}}\n"%(Scale_W_Factor_global_str,Cuts_Total_Number_mm));
+        Output_Beamer_Latex_File_mm.write("\graphicspath{{/home/matteo/Tesi/LxPlus_Matteo/ControlPlots/17gen/TTBarCR_%s/ScaleW%s_ScaleT%s/Consecutive_Cuts_%.0f/}}\n"%(ordering,Scale_W_Factor_global_str,Scale_T_Factor_global_str,(Cuts_Total_Number_mm)));
         latex_graph_include(sampleValue[nsample][0],sampleValue[nsample][2],sampleValue[nsample][5],Output_Beamer_Latex_File_mm,latex_FrameSubtitle,latex_FrameTitle);
         
 
@@ -2033,7 +2049,7 @@ if __name__ == '__main__':
         sigma2_rel_epsilon_data=TMath.Power(((sigma_n_a_data)/(N_a_data)),2)+TMath.Power(((sigma_n_b_data)/(N_b_data)),2);
         sigma2_rel_epsilon_mc=TMath.Power(((sigma_n_a_mc)/(N_a_mc)),2)+TMath.Power(((sigma_n_b_mc)/(N_b_mc)),2);
         
-        sigma_k=TMath.Sqrt(TMath.Power((sigma2_rel_epsilon_data),2)+TMath.Power((sigma2_rel_epsilon_mc),2))*k_factor;
+        sigma_k=TMath.Sqrt(TMath.Power((sigma2_rel_epsilon_data),1)+TMath.Power((sigma2_rel_epsilon_mc),1))*k_factor;
         
         
         scale_t_factor=N_b_data/N_b_mc;
