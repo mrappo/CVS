@@ -35,7 +35,8 @@ void banner4Plot (const bool & isLabel){
   TPaveText* pt ;
   if (!isLabel) pt = new TPaveText(.20,0.69,.34,.91,"NDC");
   else pt = new TPaveText(.22,0.69,.28,.91,"NDC");
-  pt->AddText("CMS preliminary");
+  //pt->AddText("CMS preliminary");
+  pt->AddText("Matteo");
   //pt->AddText("250 < p_{T} < 350 GeV");
   //pt->AddText("p_{T} > 200 GeV");
   //  pt->AddText("|#eta|<2.1");
@@ -234,6 +235,13 @@ int main (int argc, char **argv){
 
   std::cout<<" Lumi: "<<Lumi<<std::endl;
   std::cout<<"      "<<std::endl;
+
+  // MATTEO ADDED
+  double Mass         = gConfigParser -> readDoubleOption("Option::Mass");
+  const char* Sample  = gConfigParser -> readStringOption("Option::Sample");
+  const char* LetterName  = gConfigParser -> readStringOption("Option::LetterName");
+  // END MATTEO ADDED
+
 
   bool isttbar_controlplots = false ;
   try{ isttbar_controlplots  = gConfigParser -> readBoolOption("Option::ttbarControlplots");}
@@ -644,19 +652,20 @@ std::cout<<" Signal ggH Entries "<<histos[iCut][iVar][iSample]->GetEntries()<< "
           // Define Legends
 	  //	  leg[iCut][iVar] = new TLegend (0.46, 0.51, 0.85, 0.91);
 	  //	  leg[iCut][iVar] = new TLegend (0.45, 0.65, 0.85, 0.95);
-	  leg[iCut][iVar] = new TLegend (0.3, 0.69, 0.85, 0.95);
+	  leg[iCut][iVar] = new TLegend (0.15, 0.69, 0.85, 0.95);
 	  //	  leg[iCut][iVar] = new TLegend (0.45, 0.65, 0.85, 0.95);
   	  leg[iCut][iVar]->SetFillColor(0);
-  	  leg[iCut][iVar]->SetTextSize(0.04);
+  	  leg[iCut][iVar]->SetTextSize(0.03); // MATTEO CHANGED --------> Old: 0.04);
   	  leg[iCut][iVar]->SetFillStyle(0);
 	  leg[iCut][iVar]->SetNColumns(2);
           leg[iCut][iVar]->SetBorderSize(0);
+          
 
 	  //	  legNoRatio[iCut][iVar] = new TLegend (0.49, 0.51, 0.85, 0.91);
 	  legNoRatio[iCut][iVar] = new TLegend (0.3, 0.69, 0.85, 0.95);
   	  legNoRatio[iCut][iVar]->SetFillColor(0);
   	  legNoRatio[iCut][iVar]->SetFillStyle(0);
-  	  legNoRatio[iCut][iVar]->SetTextSize(0.04);
+  	  legNoRatio[iCut][iVar]->SetTextSize(0.03); // MATTEO CHANGED --------> Old: 0.04);
 	  legNoRatio[iCut][iVar]->SetNColumns(2);
           legNoRatio[iCut][iVar]->SetBorderSize(0);
 
@@ -1077,7 +1086,8 @@ std::cout<<" Signal ggH Entries "<<histos[iCut][iVar][iSample]->GetEntries()<< "
 	            if(!NormalizeSignalToData)  Name = Form("%s x %d",NameReducedSample.at(iSampleggH).c_str(),int(SignalScaleFactor));
 	            else                        Name = Form("%s",NameReducedSample.at(iSampleggH).c_str());
 
-                    Name = Form("ggH x %d, 1000GeV",int(SignalScaleFactor));
+                    //Name = Form("ggH x %d, 1000GeV",int(SignalScaleFactor));
+                    Name = Form("%s gg x %d",Sample,int(SignalScaleFactor)); // MATTEO CHANGED
 
                     histos_overflow[iCut][iVar][iSampleggH]->SetLineWidth(3);
                     histos_overflow[iCut][iVar][iSampleggH]->SetFillStyle(0);
@@ -1098,12 +1108,12 @@ std::cout<<" Signal ggH Entries "<<histos[iCut][iVar][iSample]->GetEntries()<< "
 	            else                        Name = Form("%s",NameReducedSample.at(iSampleqqH).c_str());
 
 
-                    Name = Form("qqH x %d, 1000GeV",int(SignalScaleFactor));
-
+                    //Name = Form("qqH x %d, 1000GeV",int(SignalScaleFactor));
+                    Name = Form("%s VBF x %d",Sample,int(SignalScaleFactor)); // MATTEO CHANGED
                     histos_overflow[iCut][iVar][iSampleqqH]->SetLineWidth(3);
                     histos_overflow[iCut][iVar][iSampleqqH]->SetFillStyle(0);
-
-		    leg[iCut][iVar]->AddEntry( histos_overflow[iCut][iVar][iSampleqqH], Name.Data(), "l" );
+            //MATTEO ADDED
+            leg[iCut][iVar]->AddEntry( histos_overflow[iCut][iVar][iSampleqqH], Name.Data(), "l" );
 		    legNoRatio[iCut][iVar]->AddEntry( histos_overflow[iCut][iVar][iSampleqqH], Name.Data(), "l" );
  
           	    if(!NormalizeSignalToData) histos_overflow[iCut][iVar][iSampleqqH]->Scale(SignalScaleFactor*1.);
@@ -1173,12 +1183,12 @@ std::cout<<" Signal ggH Entries "<<histos[iCut][iVar][iSample]->GetEntries()<< "
           
 	  
 	  if(!WithoutData) { upperPad->cd();        leg[iCut][iVar]->Draw("same");      //  LatexCMS(Lumi,LeptonType,false); 
-	    CMS_lumi( upperPad, 4, 11 ); //banner4Plot(false);
+	    CMS_lumi( upperPad, 4, 11,Lumi, Mass, LetterName ); //banner4Plot(false);
 	    upperPadNoRatio->cd(); legNoRatio[iCut][iVar]->Draw("same"); //LatexCMS(Lumi,LeptonType,true);  
-	    CMS_lumi( upperPad, 4, 11 ); //banner4Plot(true); 
+	    CMS_lumi( upperPad, 4, 11,Lumi,Mass, LetterName ); //banner4Plot(true); 
           }
           else { upperPad->cd(); leg[iCut][iVar]->Draw("same"); //LatexCMS(Lumi,LeptonType,true); 
-	    CMS_lumi( upperPad, 4, 11 ); }//banner4Plot(true); }
+	    CMS_lumi( upperPad, 4, 11,Lumi,Mass, LetterName ); }//banner4Plot(true); }
 
           // Ratio Plot
 	  if(!WithoutData) {
@@ -1701,11 +1711,23 @@ std::cout<<" Signal ggH Entries "<<histos[iCut][iVar][iSample]->GetEntries()<< "
                                                                  histos_overflow[iCut][iVar][iSampleGraviton]->DrawCopy("hist axissame");
 	     if(!WithoutData) { upperPadLogNoRatio->cd(); histos_overflow[iCut][iVar][iSampleGraviton]->DrawCopy("hist same"); histos_overflow[iCut][iVar][iSampleGraviton]->DrawCopy("hist axissame"); }
           }
-	  
+	  /* ORIGINAL VERSION
 	  if(!WithoutData) { upperPadLog->cd(); leg[iCut][iVar]->Draw("same"); LatexCMS(Lumi,LeptonType,false); banner4Plot(false);
                              upperPadLogNoRatio->cd(); legNoRatio[iCut][iVar]->Draw("same"); LatexCMS(Lumi,LeptonType,true); banner4Plot(true);}
           else { upperPadLog->cd(); leg[iCut][iVar]->Draw("same"); LatexCMS(Lumi,LeptonType,true); banner4Plot(true); } 
-
+      */
+      
+      //MATTEO CHANGED
+            
+      if(!WithoutData) { upperPadLog->cd();        leg[iCut][iVar]->Draw("same");      //  LatexCMS(Lumi,LeptonType,false); 
+	    CMS_lumi( upperPadLog, 4, 11,Lumi, Mass, LetterName ); //banner4Plot(false);
+	    upperPadLogNoRatio->cd(); legNoRatio[iCut][iVar]->Draw("same"); //LatexCMS(Lumi,LeptonType,true);  
+	    CMS_lumi( upperPadLog, 4, 11,Lumi,Mass, LetterName ); //banner4Plot(true); 
+          }
+          else { upperPadLog->cd(); leg[iCut][iVar]->Draw("same"); //LatexCMS(Lumi,LeptonType,true); 
+	           CMS_lumi( upperPadLog, 4, 11,Lumi,Mass, LetterName ); }//banner4Plot(true); }
+      //End MATTEO CHANGED
+      
           upperPadLog->Update(); 
           cLog[iCut][iVar]->Update(); 
 	  cLog[iCut][iVar]->Write();
