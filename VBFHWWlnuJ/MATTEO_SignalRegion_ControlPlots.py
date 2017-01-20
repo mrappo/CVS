@@ -32,8 +32,6 @@ parser.add_option('--ntuple', action="store", type="string", dest="ntuple", defa
 parser.add_option('--lumi', action="store", type="float", dest="lumi", default="2300")
 parser.add_option('--scalew', action="store", type="float", dest="scalew", default="1.21")
 parser.add_option('--nodata', action='store_true', dest='nodata', default=False)
-parser.add_option('--inverse', action='store_true', dest='inverse', default=False)
-parser.add_option('--sampleUsed', action="store", type="string", dest="sampleUsed", default="1")
 #parser.add_option('--scaleTTB', action='store_true', dest='scaleTTB', default=False)
 (options, args) = parser.parse_args()
 currentDir = os.getcwd();
@@ -56,22 +54,10 @@ Events_type_global=["Wjets_Pythia_Events_g",      # 0
 
 number_Events_type=11;
 
-Scale_W_Factor_global=options.scalew;
+Scale_W_from_Control_Plots=0.814414;
+Scale_W_Factor_global=options.scalew*Scale_W_from_Control_Plots;
 
 Scale_W_Factor_global_str=str(Scale_W_Factor_global);
-
-Scale_T_Factor_global=1.0;
-
-Scale_T_Factor_global_str=str(Scale_T_Factor_global);
-
-
-
-## Parser Variable
-lumi=options.lumi;
-lumi_str=str("%.0f"%lumi);
-Channel_global=options.channel;
-
-
 
 
 ## Incertezze
@@ -82,134 +68,28 @@ N_simulatedMC_TTBar_global=19757190;
 N_simulatedMC_VV_global=1951600+14346866+18790122;
                                                
 N_simulatedMC_STop_global=613384+1680200+3299800+995600+988500;
-                          
 
+epsilon_12_data=0.180540;
+epsilon_21_data=0.235448;
+epsilon_12_MC=0.216463;
+epsilon_21_MC=0.305039;
 
+Sigma_epsilon_12_data=0.019437;
+Sigma_epsilon_21_data=0.025842;
+Sigma_epsilon_12_MC=0.021647;
+Sigma_epsilon_21_MC=0.030504;
 
-'''
-N_simulatedMC_WJets_global=10152718+#WWTree_WJets100
-                           5221599+#WWTree_WJets200
-                           1745914+#WWTree_WJets400
-                           4041997+#WWTree_WJets600bis
-                           1574633+#WWTree_WJets800
-                           255637+#WWTree_WJets1200
-                           253036; #WWTree_WJets2500
-                           
-N_simulatedMC_TTBar_global=19757190;#WWTree_TTbar
+Beta_ScaleFactor_TTBar=0.886664;
+Sigma_Beta_ScaleFactor=0.200185;
 
-N_simulatedMC_VV_global=1951600+#WWTree_WW_excl
-                        14346866+#WWTree_WZ_excl
-                        18790122;#WWTree_ZZ_excl
-                        
-                        
-                        
-N_simulatedMC_STop_global=613384+#WWTree_sch
-                          1680200+#WWTree_tch_bar
-                          3299800+#WWTree_tch
-                          995600+#WWTree_tWch
-                          988500;#WWTree_tWch_bar
-'''
- 
-Sigma_rel_simulatedMC_WJets=1/TMath.Sqrt(N_simulatedMC_WJets_global);
-Sigma_rel_simulatedMC_VV=1/TMath.Sqrt(N_simulatedMC_VV_global);
-Sigma_rel_simulatedMC_TTBar=1/TMath.Sqrt(N_simulatedMC_TTBar_global);
-Sigma_rel_simulatedMC_STop=1/TMath.Sqrt(N_simulatedMC_STop_global);
+B_Tagging_Correction_Factor=(1-epsilon_12_data)*(1-epsilon_21_data)/((1-epsilon_12_MC)*(1-epsilon_21_MC));
 
-Sigma_rel_xsec_TTBar_global=0.05;
-Sigma_rel_xsec_STop_global=0.05;
-Sigma_rel_xsec_VV_global=0.03;
+Scale_T_Factor_global=Beta_ScaleFactor_TTBar*B_Tagging_Correction_Factor;
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-## Sample Detinition       
-BulkGraviton_xsec=[0.177400,0.0331548,0.008993];
-VBF_BulkGraviton_xsec=[0.01089,0.00217,0.000655];
-Higgs_xsec=[0.33639,0.06765];
-VBF_Higgs_xsec=[0.03354,0.02375];
-
-xsec_BulkGraviton=[0.177400,0.0331548,0.008993];
-xsec_VBF_BulkGraviton=[0.01089,0.00217,0.000655];
-xsec_Higgs=[0.33639,0.06765];
-xsec_VBF_Higgs=[0.03354,0.02375];
-		    
-NumEntriesBefore_BulkGraviton=[49600,50000,50000];
-NumEntriesBefore_VBF_BulkGraviton=[50000,50000,50000];
-NumEntriesBefore_Higgs=[399600,400000];
-NumEntriesBefore_VBF_Higgs=[398400,400000];
-		    
-ScaleFactor_BulkGraviton=[900,2000,6000];
-#ScaleFactor_BulkGraviton=[900,2000,6000];
-ScaleFactor_Higgs=[25,120]
-
-used=options.sampleUsed;
-i=0;
-used_sample=[0 for i in range(len(used))];
-
-i=0;
-for i in range(len(used)):
-    used_sample[i]=int(used[i]);
-
-sampleValue_tmp =[["BulkGraviton","BG_600",600,xsec_BulkGraviton[0],NumEntriesBefore_BulkGraviton[0],ScaleFactor_BulkGraviton[0]],
-                  ["BulkGraviton","BG_800",800,xsec_BulkGraviton[1],NumEntriesBefore_BulkGraviton[1],ScaleFactor_BulkGraviton[1]],
-                  ["BulkGraviton","BG_1000",1000,xsec_BulkGraviton[2],NumEntriesBefore_BulkGraviton[2],ScaleFactor_BulkGraviton[2]],
-                  ["Higgs","H_650",650,xsec_Higgs[0],NumEntriesBefore_Higgs[0],ScaleFactor_Higgs[0]],
-                  ["Higgs","H_1000",1000,xsec_Higgs[1],NumEntriesBefore_Higgs[1],ScaleFactor_Higgs[1]]];
-              
-              
-sampleValue_VBF_tmp =[["BulkGraviton","VBF_BG_600",600,xsec_VBF_BulkGraviton[0],NumEntriesBefore_VBF_BulkGraviton[0],ScaleFactor_BulkGraviton[0]],
-                      ["BulkGraviton","VBF_BG_800",800,xsec_VBF_BulkGraviton[1],NumEntriesBefore_VBF_BulkGraviton[1],ScaleFactor_BulkGraviton[1]],
-                      ["BulkGraviton","VBF_BG_1000",1000,xsec_VBF_BulkGraviton[2],NumEntriesBefore_VBF_BulkGraviton[2],ScaleFactor_BulkGraviton[2]],
-                      ["Higgs","VBF_H_650",650,xsec_VBF_Higgs[0],NumEntriesBefore_VBF_Higgs[0],ScaleFactor_Higgs[0]],
-                      ["Higgs","VBF_H_1000",1000,xsec_VBF_Higgs[1],NumEntriesBefore_VBF_Higgs[1],ScaleFactor_Higgs[1]]];
-                  
-                  
-                  
-                  
-                  
-i=j=0;
-for i in used_sample:
-    j=j+1;
-
-Total_Number_Sample_Used=j;
-i=0;
-sampleValue = [0 for i in range(Total_Number_Sample_Used)];
-
-i=0;
-sampleValue_VBF = [0 for i in range(Total_Number_Sample_Used)]
-i=0;
-#str_used_sample="";
-for i in range(Total_Number_Sample_Used):  
-    sampleValue[i]=sampleValue_tmp[used_sample[i]];
-    sampleValue_VBF[i]=sampleValue_VBF_tmp[used_sample[i]];
-    #str_used_sample=str_used_sample+str(used_sample[i]);
-
-total_sample_value=[sampleValue,sampleValue_VBF];
-
-
-
-
-
-
-
-
-
-
-
-
-
-'''
-## Sample Detinition       
+       
 BulkGraviton_xsec=[0.177400,0.0331548,0.008993];
 VBF_BulkGraviton_xsec=[0.01089,0.00217,0.000655];
 Higgs_xsec=[0.33639,0.06765];
@@ -255,7 +135,9 @@ sampleValue_VBF =[["BulkGraviton","VBF_BG_800",800,xsec_VBF_BulkGraviton[1],NumE
 
 total_sample_value=[sampleValue,sampleValue_VBF];
 
-'''
+lumi=options.lumi;
+lumi_str=str("%.0f"%lumi);
+Channel_global=options.channel;
 
 
 
@@ -363,16 +245,12 @@ Cuts For Significance Optimization:
 if (options.channel=="el" or options.channel=="em"):
   
    
-    frameSubTitle_AD_string="\hspace{6pt} TTBar Control Region";
-    
-    if options.inverse:
-       cuts_itemize=["deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>45 && pfMET>80 && jet_tau2tau1 < 0.6 && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>0.0001 && (jet_mass_pr > 65 && jet_mass_pr < 105 )  && vbf_maxpt_j2_bDiscriminatorCSV>0.89"]; 
-       
-    else:
-       cuts_itemize=["deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>45 && pfMET>80 && jet_tau2tau1 < 0.6 && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>0.0001 && (jet_mass_pr > 65 && jet_mass_pr < 105 )  && vbf_maxpt_j1_bDiscriminatorCSV>0.89"]; 
+    frameSubTitle_AD_string="\hspace{6pt} SignalRegion";
+ 
+    cuts_itemize=["deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>45 && pfMET>80 && jet_tau2tau1 < 0.6 && abs(vbf_maxpt_j1_pt-vbf_maxpt_j2_pt)>0.0001  && nBTagJet_medium==0 && vbf_maxpt_j1_bDiscriminatorCSV<0.89 && vbf_maxpt_j2_bDiscriminatorCSV<0.89 && (jet_mass_pr > 40 && jet_mass_pr < 150 ) "]; 
 
    
-
+#&& ((jet_mass_pr > 40 && jet_mass_pr < 65 )  || ( jet_mass_pr > 135 && jet_mass_pr < 150))
 
 
 
@@ -383,14 +261,10 @@ if (options.channel=="el" or options.channel=="em"):
 else:
  
     #frameSubTitle_AD_string="\hspace{6pt} TTBarCR";
-    frameSubTitle_AD_string="\hspace{6pt} TTBar Control Region";
-    if options.inverse:
-       cuts_itemize=["deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>40 && pfMET>40 && jet_tau2tau1 < 0.6 && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>0.0001 && (jet_mass_pr > 65 && jet_mass_pr < 105 ) && vbf_maxpt_j2_bDiscriminatorCSV>0.89"]; 
-    else:
-       cuts_itemize=["deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>40 && pfMET>40 && jet_tau2tau1 < 0.6 && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>0.0001 && (jet_mass_pr > 65 && jet_mass_pr < 105 ) && vbf_maxpt_j1_bDiscriminatorCSV>0.89"]; 
+    frameSubTitle_AD_string="";
+    cuts_itemize=["1==1","deltaR_lak8jet>(TMath::Pi()/2.0)","TMath::Abs(deltaphi_METak8jet)>2.0","TMath::Abs(deltaphi_Vak8jet)>2.0","v_pt>200","ungroomed_jet_pt>200","l_pt>40","pfMET>40","nBTagJet_medium==0 && vbf_maxpt_j1_bDiscriminatorCSV<0.89 && vbf_maxpt_j2_bDiscriminatorCSV<0.89","jet_tau2tau1 < 0.6","njets>1","abs(vbf_maxpt_j1_pt-vbf_maxpt_j2_pt)>0.0001","(jet_mass_pr > 65 && jet_mass_pr < 105 )"]; 
     #cuts_itemize=["1==1 && deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>40 && pfMET>40 && nBTagJet_medium==0 && vbf_maxpt_j1_bDiscriminatorCSV<0.89 && vbf_maxpt_j2_bDiscriminatorCSV<0.89 && jet_tau2tau1 < 0.6 && njets>1 && abs(vbf_maxpt_j1_pt-vbf_maxpt_j2_pt)>0.0001 && (jet_mass_pr > 65 && jet_mass_pr < 105 )"];
     
-
 
 
 
@@ -818,10 +692,10 @@ def run_log(Sample_Number_ll,Cut_Number_ll,C_Type_ll,Cut_Total_Number_ll,Signifi
     STop_MC_ll=Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][6];
     WJets_MC_ll=Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][0];
     VV_MC_ll=Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][4]+Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][5];
-    Signal_MC_ll=Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][9]+Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][10];
-    
-    TTBar_data_ll=Data_ll-WJets_MC_ll-VV_MC_ll-Signal_MC_ll;
-    Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][number_Events_type+3]=TTBar_data_ll;
+    Signal_gg_ll=Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][9];
+    Signal_VBF_ll=Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][10];
+    WJets_data_ll=Data_ll-TTBar_MC_ll-VV_MC_ll-STop_MC_ll-Signal_gg_ll-Signal_VBF_ll;
+    Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][number_Events_type+3]=WJets_data_ll;
     
     
     
@@ -849,12 +723,7 @@ def run_log(Sample_Number_ll,Cut_Number_ll,C_Type_ll,Cut_Total_Number_ll,Signifi
                    " ",
                    "Signal_VBF MC Events: %f"%Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][10], # 10
                    " ",
-                   "Data: %f"%Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][number_Events_type+2], 
-                   " ",
-                   " ",    
-                   "TTBar MC Events Number: %f"%(TTBar_MC_ll+STop_MC_ll),
-                   " ",
-                   "TTBar DATA Events Number: %f"%TTBar_data_ll];
+                   "Data: %f"%Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][number_Events_type+2]];
     
  
     print_boxed_string_File(result_string,Summary_Output_File_ll);
@@ -1155,10 +1024,12 @@ def latex_graph_include(Sample_gi,Mass_gi,ScaleFactor_gi,ofile_gi,FrameSubTitle_
 
 
     SampleMass_gi=Sample_gi+str("%.0f"%Mass_gi);
+    
     ofile_gi.write("\\begin{frame}[allowframebreaks]\n");
     ofile_gi.write("\\frametitle{Control Plots: %s %.0f - SignalScaleFactor %.0f - %s }\n"%(Sample_gi,Mass_gi,ScaleFactor_gi,FrameTitle_gi));
     ofile_gi.write(FrameSubTitle_gi);
-
+    
+    '''
     ofile_gi.write("\setcounter{subfigure}{0}\n");
     ofile_gi.write("\\begin{figure}[h]\n");
     ofile_gi.write("\\begin{center}\n");
@@ -1186,6 +1057,7 @@ def latex_graph_include(Sample_gi,Mass_gi,ScaleFactor_gi,ofile_gi,FrameSubTitle_
     
 
     ofile_gi.write("\\framebreak\n");
+    '''
     ofile_gi.write("\setcounter{subfigure}{0}\n");
     ofile_gi.write("\\begin{figure}[h]\n");
     ofile_gi.write("\\begin{center}\n");
@@ -1343,6 +1215,18 @@ def latex_graph_include(Sample_gi,Mass_gi,ScaleFactor_gi,ofile_gi,FrameSubTitle_
     ofile_gi.write("\label{}\n");
     ofile_gi.write("\end{center}\n");
     ofile_gi.write("\end{figure}\n");
+    
+    ofile_gi.write("\\framebreak\n");
+    ofile_gi.write("\setcounter{subfigure}{0}\n");
+    ofile_gi.write("\\begin{figure}[h]\n");
+    ofile_gi.write("\\begin{center}\n");
+    ofile_gi.write("\subfloat[][\emph{\\texttt{jet\_mass\_pr}}]\n");
+    ofile_gi.write("{\includegraphics[width=.45\columnwidth]{%s/data/Run2_MCDataComparisonRSGraviton2000_%s_plot/jet_mass_pr_0.pdf}}  \quad \n"%(SampleMass_gi,Channel_global));
+    ofile_gi.write("\subfloat[][\emph{\\texttt{jet\_mass\_pr} Log Scale}]\n");
+    ofile_gi.write("{\includegraphics[width=.45\columnwidth]{%s/data/Run2_MCDataComparisonRSGraviton2000_%s_plot/jet_mass_pr_0_Log.pdf}}\n"%(SampleMass_gi,Channel_global));
+    ofile_gi.write("\label{}\n");
+    ofile_gi.write("\end{center}\n");
+    ofile_gi.write("\end{figure}\n");
         
      
  
@@ -1355,6 +1239,7 @@ def latex_graph_include(Sample_gi,Mass_gi,ScaleFactor_gi,ofile_gi,FrameSubTitle_
    
     
     
+
 
 
 
@@ -1437,17 +1322,12 @@ if __name__ == '__main__':
     
     ControlP_Dir_2=ControlP_Dir_1+"/%s_Channel"%Channel_global;
     if not os.path.isdir(ControlP_Dir_2):
-           pd5 = subprocess.Popen(['mkdir',ControlP_Dir_2]);
-           pd5.wait(); 
-    
-    ControlP_Dir_3=ControlP_Dir_2+"/TTBarCR_SF";
-    if not os.path.isdir(ControlP_Dir_3):
-           pd6 = subprocess.Popen(['mkdir',ControlP_Dir_3]);
-           pd6.wait();
+           pd4b = subprocess.Popen(['mkdir',ControlP_Dir_2]);
+           pd4b.wait(); 
     
     
     
-    Scale_W_Factor_Dir_mm=ControlP_Dir_3
+    Scale_W_Factor_Dir_mm=ControlP_Dir_2+"/SignalRegion";
     
 
     if os.path.isdir(Scale_W_Factor_Dir_mm):
@@ -1468,6 +1348,9 @@ if __name__ == '__main__':
     #pd7.wait();
     
     
+
+
+    
     #########################################################
     ######### MAKE OUTPUT FILE
     #########################################################    
@@ -1478,13 +1361,22 @@ if __name__ == '__main__':
     summary_latex_mm = Control_Plots_Dir_mm+"/Summary_latex_ControlPlots.tex";
     Output_Summary_Latex_File_mm=open(summary_latex_mm,'w+');
     
-    latex_file = Control_Plots_Dir_mm+"/SF_TTBar_ControlPlots.tex";
+    latex_file = Control_Plots_Dir_mm+"/SignalRegion_ControlPlots.tex";
     Output_Beamer_Latex_File_mm=open(latex_file,'w+');
 
-     # Make Efficiency File
-    ScaleFactor_file = Control_Plots_Dir_mm+"/ScaleFactor.txt";
-    Output_ScaleFactor_File_mm=open(ScaleFactor_file,'w+');
-     
+
+    ################################################
+    #### TTBar Scale Factor
+    #################################################
+    tmp_scale_T_factor_string=["TTBar ScaleFactor UTILIZED",
+                               " ",
+                               "SF TTBar: %f"%Beta_ScaleFactor_TTBar,
+                               " ",
+                               "B-Tag CorrectionFactor: %f"%B_Tagging_Correction_Factor,
+                               " ",
+                               "Total TTBar SF: %f"%Scale_T_Factor_global];
+    
+    print_boxed_string_File(tmp_scale_T_factor_string,Output_Summary_File_mm);
 
 
     
@@ -1493,9 +1385,6 @@ if __name__ == '__main__':
     #########################################################
     ######### MAKE CONFIGURATION FILE
     ######################################################### 
-    
-   
-    
     
     # Make Cuts File
     counter=0;
@@ -1537,24 +1426,22 @@ if __name__ == '__main__':
         
         Plus_Cut_Counter=cut_counter+1;
         
-        Cut_Add_FileName="TTBarCr_"+options.channel+"_"+str(Plus_Cut_Counter);
-        
         cuts_table_main[0][cut_counter]=cut_string1;
         cuts_table_main[1][cut_counter]=cut_string2;
         
-        cuts_file1=Cuts_File_Dir_mm+"/MATTEO_cuts_file1_%s.txt"%(Cut_Add_FileName);
+        cuts_file1=Cuts_File_Dir_mm+"/MATTEO_cuts_file1_%s.txt"%(str(Plus_Cut_Counter));
         output_cuts_file1=open(cuts_file1,'w+');
         output_cuts_file1.write(cut_string1);
         output_cuts_file1.close();
 
-        cuts_file2=Cuts_File_Dir_mm+"/MATTEO_cuts_file2_%s.txt"%(Cut_Add_FileName);
+        cuts_file2=Cuts_File_Dir_mm+"/MATTEO_cuts_file2_%s.txt"%(str(Plus_Cut_Counter));
         output_cuts_file2=open(cuts_file2,'w+');
         output_cuts_file2.write(cut_string2);
         output_cuts_file2.close();
         
         
         
-      
+        #def print_lined_string_File(in_string_vector,out_file):
         
         resume_making_cuts_file=["Making CutsFile",
                                  "Total number of cuts:\t%.0f"%(Cuts_Total_Number_mm),
@@ -1565,9 +1452,9 @@ if __name__ == '__main__':
                                  " ",
                                  "Cut file 2:\t%s"%(cuts_file2),
                                  "Cut String 2:\t%s"%(cut_string2)];
-
+        #print_lined_string(resume_making_cuts_file)
         print_lined_string_File(resume_making_cuts_file,Output_Summary_File_mm)
-        
+
         Cuts_filename_table[0][cut_counter]=cuts_file1;
         Cuts_filename_table[1][cut_counter]=cuts_file2;
     
@@ -1579,91 +1466,91 @@ if __name__ == '__main__':
     Output_VariableList_mm.write("############################################################################\n");
     Output_VariableList_mm.write("##  Variable						Nbin		Min		Max			Label\n");
     Output_VariableList_mm.write("############################################################################\n");
-    #Output_VariableList_mm.write("l_pt							50			0		1000		pT_{l}_(GeV)\n");
+    Output_VariableList_mm.write("# l_pt							50			0		1000		pT_{l}_(GeV)\n");
     Output_VariableList_mm.write("# nPV								25			0		50			nPV\n");
-    Output_VariableList_mm.write("# l_pt							25			0		500			pT_{l}_(GeV)\n");
-    Output_VariableList_mm.write("# l_eta							25			-2.5	2.5			#eta_{l}\n");
+    Output_VariableList_mm.write("l_pt							25			0		500			pT_{l}_(GeV)\n");
+    Output_VariableList_mm.write("l_eta							25			-2.5	2.5			#eta_{l}\n");
     Output_VariableList_mm.write("# l_eta							20			-2.5	2.5			#eta_{l}\n");
-    Output_VariableList_mm.write("# l_phi							30			-3.14	3.14		#phi_{l}\n");
-    #Output_VariableList_mm.write("v_pt							25			200		700			pT^{W}_{l}_(GeV)\n");
-    Output_VariableList_mm.write("#v_mt								20			0		400			mT^{W}_{l}_(GeV)\n");
-    Output_VariableList_mm.write("# pfMET							28			0		560			MET[GeV]\n");
+    Output_VariableList_mm.write("l_phi							30			-3.14	3.14		#phi_{l}\n");
+    Output_VariableList_mm.write("v_pt							25			200		700			pT^{W}_{l}_(GeV)\n");
+    Output_VariableList_mm.write("v_mt								20			0		400			mT^{W}_{l}_(GeV)\n");
+    Output_VariableList_mm.write(" pfMET							28			0		560			MET[GeV]\n");
     Output_VariableList_mm.write("# pfMETpuppi						28			0		560			MET[GeV]\n");
-    Output_VariableList_mm.write("pfMET							50      0       1000      MET[GeV]\n");
+    Output_VariableList_mm.write("# pfMET							50      0       1000      MET[GeV]\n");
     Output_VariableList_mm.write("# pfMETpuppi_Phi					20   -3.15      3.15	  #phi_{Puppi MET}\n");
     Output_VariableList_mm.write("# pfMET_Phi						30   -3.14      3.14	  #phi_{MET}\n");
-    #Output_VariableList_mm.write("ungroomed_jet_pt				32    100       740      pT^{AK8}_(GeV)\n");
-    #Output_VariableList_mm.write("ungroomed_jet_eta				25    -2.5      2.5        #eta^{AK8}\n");
+    Output_VariableList_mm.write("ungroomed_jet_pt				32    100       740      pT^{AK8}_(GeV)\n");
+    Output_VariableList_mm.write("# ungroomed_jet_eta				25    -2.5      2.5        #eta^{AK8}\n");
     Output_VariableList_mm.write("# ungroomed_jet_phi				30    -3.14     3.14     #phi^{AK8}\n");
     Output_VariableList_mm.write("# ungroomed_PuppiAK8_jet_pt		32    100       740      pT^{puppi AK8}_(GeV)\n");
     Output_VariableList_mm.write("# ungroomed_PuppiAK8_jet_eta		25    -2.5      2.5        #eta^{puppi AK8}\n");
     Output_VariableList_mm.write("# ungroomed_PuppiAK8_jet_phi		30    -3.14     3.14     #phi^{puppi AK8}\n");
-    #Output_VariableList_mm.write("jet_mass_pr						15      65       105     Jet_Pruned_Mass_(GeV/c^{2})\n");
+    Output_VariableList_mm.write("jet_mass_pr						15      65       105     Jet_Pruned_Mass_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# jet_mass_pr						22      40       150    Jet_Pruned_Mass_(GeV)\n");
     Output_VariableList_mm.write("# jet_mass_so						22      40       150    Jet_Softdrop_Mass_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# PuppiAK8_jet_mass_pr			22      40       150    puppiAK8_Jet_Pruned_Mass_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# PuppiAK8_jet_mass_so			22      40       150    puppiAK8_Jet_Softdrop_Mass_(GeV/c^{2})\n");
-    Output_VariableList_mm.write("# mass_lvj_type0					40    0       3000    M_{WW}_(GeV/c^{2})\n");
-    Output_VariableList_mm.write("# mass_lvj_type2					40    0       3000    M_{WW}_(GeV/c^{2})\n");
+    Output_VariableList_mm.write("mass_lvj_type0					40    0       3000    M_{WW}_(GeV/c^{2})\n");
+    Output_VariableList_mm.write("mass_lvj_type2					40    0       3000    M_{WW}_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# mass_lvj_type0_PuppiAK8			40    0       3000    M_{WW}_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# mass_lvj_type2_PuppiAK8			40    0       3000    M_{WW}_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# mass_lvj_type0_met				56    200       3000    M_{WW}_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# mass_lvj_type2_met				56    200       3000    M_{WW}_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# nu_pz_type0						30   -500      500        pZ^{#nu}[GeV]\n");
     Output_VariableList_mm.write("# nu_pz_type2                   30   -500      500        pZ^{#nu}[GeV]\n");
-    Output_VariableList_mm.write("# nu_pz_type0_met                   60   -500      500        pZ^{#nu}[GeV]\n");
-    Output_VariableList_mm.write("# nu_pz_type2_met                   60   -500      500        pZ^{#nu}[GeV]\n");
-    Output_VariableList_mm.write("# nbjets_csvl_veto                  5      0       5        N_{bjet}^{csvl}\n");
-    Output_VariableList_mm.write("# nbjets_csvm_veto                  5      0       5        N_{bjet}^{csvm}\n");
-    Output_VariableList_mm.write("# nbjets_csvt_veto                  5      0       5        N_{bjet}^{csvt}\n");
-    Output_VariableList_mm.write("# numberJetBin                      5      0       5        N_{jets}\n");
-    #Output_VariableList_mm.write("jet_tau2tau1                     25     0.      1.       #tau_{2}/#tau_{1}\n");
+    Output_VariableList_mm.write("#nu_pz_type0_met                   60   -500      500        pZ^{#nu}[GeV]\n");
+    Output_VariableList_mm.write("#nu_pz_type2_met                   60   -500      500        pZ^{#nu}[GeV]\n");
+    Output_VariableList_mm.write("#nbjets_csvl_veto                  5      0       5        N_{bjet}^{csvl}\n");
+    Output_VariableList_mm.write("#nbjets_csvm_veto                  5      0       5        N_{bjet}^{csvm}\n");
+    Output_VariableList_mm.write("#nbjets_csvt_veto                  5      0       5        N_{bjet}^{csvt}\n");
+    Output_VariableList_mm.write("#numberJetBin                      5      0       5        N_{jets}\n");
+    Output_VariableList_mm.write("jet_tau2tau1                     25     0.      1.       #tau_{2}/#tau_{1}\n");
     Output_VariableList_mm.write("# PuppiAK8_jet_tau2tau1                     25     0.      1.       puppiAK8_#tau_{2}/#tau_{1}\n");
-    Output_VariableList_mm.write("# jet2_pt				 25	0	500	 pT^{AK4}_{1}_(GeV)\n");
-    Output_VariableList_mm.write("# jet2_btag				 25	0	1	 btag^{AK4}_{1}_(GeV)\n");
-    Output_VariableList_mm.write("# jet3_pt				 25	0	500	 pT^{AK4}_{1}_(GeV)\n");
-    Output_VariableList_mm.write("# jet3_btag				 25	0	1	 btag^{AK4}_{1}_(GeV)\n");
-    Output_VariableList_mm.write("# jet_tau2tau1_exkT                30     0.1      1.      #tau_{2}/#tau_{1}_extkT\n");
-    Output_VariableList_mm.write("# jet_tau2tau1_pr                  30     0.1      1.      #tau_{2}/#tau_{1}_pruned\n");
-    Output_VariableList_mm.write("# jet_massdrop_pr                  35     0.1      1.      Pruned_Mass_Drop_(GeV/c^{2})\n");
-    Output_VariableList_mm.write("# jet_qjetvol                      35     0        1.         QjetVolatility\n");
-    Output_VariableList_mm.write("# jet_charge                       50     -2.5     2.5       Jet_Charge\n");
-    Output_VariableList_mm.write("# jet_charge_k05                       50     -2.0     2.0       Jet_Charge_k05\n");
-    Output_VariableList_mm.write("# jet_charge_k07                       50     -1.5     1.5       Jet_Charge_k07\n");
-    Output_VariableList_mm.write("# jet_charge_k10                       45     -0.8     0.8       Jet_Charge_k10\n");
-    Output_VariableList_mm.write("# jet_GeneralizedECF                   35     0.     0.6       Jet_Generalized_ECF\n");
-    Output_VariableList_mm.write("# ttb_ca8_mass_pr                   25      40      130      Jet_Pruned_Mass_(GeV/c^{2})\n");
-    Output_VariableList_mm.write("# ttb_ht                            35     0      700       \n");
-    Output_VariableList_mm.write("# ttb_ca8_ungroomed_pt              30   200      600       pT^{AK8}[GeV]\n");
-    Output_VariableList_mm.write("# ttb_ca8_tau2tau1_exkT             30    0.1      1.0      #tau_{2}/#tau_{1}_exkT\n");
-    Output_VariableList_mm.write("# ttb_ca8_tau2tau1_pr               30    0.1      1.0       #tau_{2}/#tau_{1}_pruned\n");
-    Output_VariableList_mm.write("# ttb_ca8_tau2tau1                  30    0.1      1.0       #tau_{2}/#tau_{1}\n");
-    Output_VariableList_mm.write("# ttb_ca8_charge                    50     -2.5     2.5       Jet_Charge\n");
-    Output_VariableList_mm.write("# ttb_ca8_charge_k05                50     -2.0     2.0       Jet_Charge_k05\n");
-    Output_VariableList_mm.write("# ttb_ca8_charge_k07                50     -1.5     1.5       Jet_Charge_k07\n");
-    Output_VariableList_mm.write("# ttb_ca8_charge_k10                45     -0.8     0.8       Jet_Charge_k10\n");
-    Output_VariableList_mm.write("# ttb_ca8_GeneralizedECF            30     0.     0.5       Jet_Generalized_ECF\n");
-    Output_VariableList_mm.write("# ttb_ca8_mu                        20    0.1      0.7       Pruned_Mass_Drop_(GeV/c^{2})\n");
-    Output_VariableList_mm.write("# ttb_mlvj                          40   400     1400       M_{WW}(GeV/c^{2})\n");
-    #Output_VariableList_mm.write("vbf_maxpt_j1_bDiscriminatorCSV  50      0       1          j1_bDiscriminator\n");
-    #Output_VariableList_mm.write("vbf_maxpt_j1_eta                50      -5      5          #eta_{j1}\n");
-    #Output_VariableList_mm.write("vbf_maxpt_j1_pt                 50      0       300        pT_{j1}_(GeV)\n");
-    Output_VariableList_mm.write("# vbf_maxpt_j1_QGLikelihood       50      0       1          j1_QGLikelihood\n");
+    Output_VariableList_mm.write("jet2_pt				 25	0	500	 pT^{AK4}_{1}_(GeV)\n");
+    Output_VariableList_mm.write("jet2_btag				 25	0	1	 btag^{AK4}_{1}_(GeV)\n");
+    Output_VariableList_mm.write("jet3_pt				 25	0	500	 pT^{AK4}_{1}_(GeV)\n");
+    Output_VariableList_mm.write("jet3_btag				 25	0	1	 btag^{AK4}_{1}_(GeV)\n");
+    Output_VariableList_mm.write("#jet_tau2tau1_exkT                30     0.1      1.      #tau_{2}/#tau_{1}_extkT\n");
+    Output_VariableList_mm.write("#jet_tau2tau1_pr                  30     0.1      1.      #tau_{2}/#tau_{1}_pruned\n");
+    Output_VariableList_mm.write("#jet_massdrop_pr                  35     0.1      1.      Pruned_Mass_Drop_(GeV/c^{2})\n");
+    Output_VariableList_mm.write("#jet_qjetvol                      35     0        1.         QjetVolatility\n");
+    Output_VariableList_mm.write("#jet_charge                       50     -2.5     2.5       Jet_Charge\n");
+    Output_VariableList_mm.write("#jet_charge_k05                       50     -2.0     2.0       Jet_Charge_k05\n");
+    Output_VariableList_mm.write("#jet_charge_k07                       50     -1.5     1.5       Jet_Charge_k07\n");
+    Output_VariableList_mm.write("#jet_charge_k10                       45     -0.8     0.8       Jet_Charge_k10\n");
+    Output_VariableList_mm.write("#jet_GeneralizedECF                   35     0.     0.6       Jet_Generalized_ECF\n");
+    Output_VariableList_mm.write("#ttb_ca8_mass_pr                   25      40      130      Jet_Pruned_Mass_(GeV/c^{2})\n");
+    Output_VariableList_mm.write("#ttb_ht                            35     0      700       \n");
+    Output_VariableList_mm.write("#ttb_ca8_ungroomed_pt              30   200      600       pT^{AK8}[GeV]\n");
+    Output_VariableList_mm.write("#ttb_ca8_tau2tau1_exkT             30    0.1      1.0      #tau_{2}/#tau_{1}_exkT\n");
+    Output_VariableList_mm.write("#ttb_ca8_tau2tau1_pr               30    0.1      1.0       #tau_{2}/#tau_{1}_pruned\n");
+    Output_VariableList_mm.write("#ttb_ca8_tau2tau1                  30    0.1      1.0       #tau_{2}/#tau_{1}\n");
+    Output_VariableList_mm.write("#ttb_ca8_charge                    50     -2.5     2.5       Jet_Charge\n");
+    Output_VariableList_mm.write("#ttb_ca8_charge_k05                50     -2.0     2.0       Jet_Charge_k05\n");
+    Output_VariableList_mm.write("#ttb_ca8_charge_k07                50     -1.5     1.5       Jet_Charge_k07\n");
+    Output_VariableList_mm.write("#ttb_ca8_charge_k10                45     -0.8     0.8       Jet_Charge_k10\n");
+    Output_VariableList_mm.write("#ttb_ca8_GeneralizedECF            30     0.     0.5       Jet_Generalized_ECF\n");
+    Output_VariableList_mm.write("#ttb_ca8_mu                        20    0.1      0.7       Pruned_Mass_Drop_(GeV/c^{2})\n");
+    Output_VariableList_mm.write("#ttb_mlvj                          40   400     1400       M_{WW}(GeV/c^{2})\n");
+    Output_VariableList_mm.write("vbf_maxpt_j1_bDiscriminatorCSV  50      0       1          j1_bDiscriminator\n");
+    Output_VariableList_mm.write("vbf_maxpt_j1_eta                50      -5      5          #eta_{j1}\n");
+    Output_VariableList_mm.write("vbf_maxpt_j1_pt                 50      0       300        pT_{j1}_(GeV)\n");
+    Output_VariableList_mm.write("#vbf_maxpt_j1_QGLikelihood       50      0       1          j1_QGLikelihood\n");
     Output_VariableList_mm.write("vbf_maxpt_j2_bDiscriminatorCSV  50      0       1          j2_bDiscriminator\n");
-    #Output_VariableList_mm.write("vbf_maxpt_j2_eta                50      -5      5          #eta_{j2}\n");
-    #Output_VariableList_mm.write("vbf_maxpt_j2_pt                 50      0       300        pT_{j2}_(GeV)\n");
-    Output_VariableList_mm.write("# vbf_maxpt_j2_QGLikelihood       50      0       1          j2_QGLikelihood\n");
+    Output_VariableList_mm.write("vbf_maxpt_j2_eta                50      -5      5          #eta_{j2}\n");
+    Output_VariableList_mm.write("vbf_maxpt_j2_pt                 50      0       300        pT_{j2}_(GeV)\n");
+    Output_VariableList_mm.write("#vbf_maxpt_j2_QGLikelihood       50      0       1          j2_QGLikelihood\n");
     Output_VariableList_mm.write("abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) 35    0       9     #Delta#eta_{jj}\n");
-    #Output_VariableList_mm.write("vbf_maxpt_jj_m                  40      0       1500        M_{jj}_(GeV/c^{2})\n");
-    Output_VariableList_mm.write("#vbf_maxpt_jj_phi                50      -3.14   3.14       #phi_{jj}\n");
-    #Output_VariableList_mm.write("vbf_maxpt_jj_eta                30      -4.7       4.7     #eta_{jj}\n");
-    Output_VariableList_mm.write("# mass_ungroomedjet_closerjet      30      80     400         M_{top}^{had}\n");
-    Output_VariableList_mm.write("# mass_leptonic_closerjet          30      100     400   	    M_{top}^{lep}\n");
-    Output_VariableList_mm.write("#jet_tau2tau1                    30       0.1       1.0          #tau_{2}/#tau_{1}\n");
-    #Output_VariableList_mm.write("deltaR_lak8jet                 50        0.1       5          #DeltaR\n");
-    #Output_VariableList_mm.write("deltaphi_METak8jet             50			-3.14	3.14		#Delta#phi_{met}\n");
-    #Output_VariableList_mm.write("deltaphi_Vak8jet               50			-3.14	3.14		#Delta#phi_{Wlep}\n");
-    
+    Output_VariableList_mm.write("vbf_maxpt_jj_m                  40      0       1500        M_{jj}_(GeV/c^{2})\n");
+    Output_VariableList_mm.write("vbf_maxpt_jj_phi                50      -3.14   3.14       #phi_{jj}\n");
+    Output_VariableList_mm.write("vbf_maxpt_jj_eta                30      -4.7       4.7     #eta_{jj}\n");
+    Output_VariableList_mm.write("mass_ungroomedjet_closerjet      30      80     400         M_{top}^{had}\n");
+    Output_VariableList_mm.write("mass_leptonic_closerjet          30      100     400   	    M_{top}^{lep}\n");
+    Output_VariableList_mm.write("jet_tau2tau1                    30       0.1       1.0          #tau_{2}/#tau_{1}\n");
+    Output_VariableList_mm.write("deltaR_lak8jet                 30        0.1       5          #DeltaR\n");
+    Output_VariableList_mm.write("deltaphi_METak8jet             30			-3.14	3.14		#Delta#phi_{met}\n");
+    Output_VariableList_mm.write("deltaphi_Vak8jet               30			-3.14	3.14		#Delta#phi_{Wlep}\n");
+    Output_VariableList_mm.write("jet_mass_pr                    50         20      170         Pruned_Jet_Mass \n");
     Output_VariableList_mm.close();
     # Make InputFile and SampleListFile
     Ntuple_mm=options.ntuple;       
@@ -1685,7 +1572,7 @@ if __name__ == '__main__':
         Mass_mm=sampleValue[Sample_Counter_mm][2];
         Mass_str_mm=str("%.0f"%Mass_mm);
             
-        FileName_Sample_mm="cfg/DataMCComparison_InputCfgFile/MATTEO_SampleList_76x_%s_%s%s_TTBarCR_%s.txt"%(Ntuple_mm,Sample_mm,Mass_str_mm,options.channel);
+        FileName_Sample_mm="cfg/DataMCComparison_InputCfgFile/MATTEO_SampleList_76x_%s_%s%s.txt"%(Ntuple_mm,Sample_mm,Mass_str_mm);
     
     
         Output_SampleFile_mm=open(FileName_Sample_mm,'w+');
@@ -1844,7 +1731,7 @@ if __name__ == '__main__':
                 print "\nInputFilename: %s\t Directory: %s\n"%(Cfg_FileName_Table_mm[i][j][k],Cfg_FileName_Table_mm[i][j][Sample_Total_Number_mm+k])
     print "\n\n-------------------------------------------\n"
     i=j=k=0;
-    Significance_Table_mm=[[[[0 for z in range(number_Events_type+4) ]for k in range(Sample_Total_Number_mm)]for j in range(Cuts_Total_Number_mm)]for i in range(2)];
+    Significance_Table_mm=[[[[0 for z in range(number_Events_type+5) ]for k in range(Sample_Total_Number_mm)]for j in range(Cuts_Total_Number_mm)]for i in range(2)];
     
     
 
@@ -1855,17 +1742,9 @@ if __name__ == '__main__':
     
     
     
- 
-        
-    print "\n\n  -----------------------"
-    print " |                       |"
-    print " |  NO TTB Scale Factor  |"
-    print " |                       |"
-    print "  -----------------------\n\n"
+
        
-    TTBar_Scale_Factor_mm=1.0;
-       
-    TTBar_Scale_Factor_mm_str=str(TTBar_Scale_Factor_mm);
+   
 
 
 
@@ -1879,6 +1758,11 @@ if __name__ == '__main__':
     #########################################################
     ######### MAKE CONTROL PLOTS
     #########################################################
+    
+    
+    TTBar_Scale_Factor_mm=Scale_T_Factor_global;
+    TTBar_Scale_Factor_mm_str=str(TTBar_Scale_Factor_mm);
+    
     Cut_Number_mm=0
     for Cut_Number_mm in range(Cuts_Total_Number_mm):
         
@@ -1905,10 +1789,13 @@ if __name__ == '__main__':
                                   "Using Cuts File 1:\t%s"%(cuts_file1),
                                   "Using Cuts File 2:\t%s"%(cuts_file2)];
         
-      
+        #print_lined_string(resume_controPlotsMaking)
         print_lined_string_File(resume_controPlotsMaking,Output_Summary_File_mm);
 
-
+        
+        
+        
+        
         # Run ControPlots code
         n_sample=0;
         for n_sample in range(Sample_Total_Number_mm):
@@ -1919,7 +1806,8 @@ if __name__ == '__main__':
             mass=sampleValue[n_sample][2];
             mass_str=str("%.0f"%mass);       
             
-
+          
+            
             final_dir1=control_cuts1_dir+"/"+sample+mass_str;
             if not os.path.isdir(final_dir1):
                pd10 = subprocess.Popen(['mkdir',final_dir1]);
@@ -1939,17 +1827,24 @@ if __name__ == '__main__':
                                       
             
             
-          
+            #print_lined_string(resume_processing_string)
             print_lined_string_File(resume_processing_string,Output_Summary_File_mm);
             
             if (Cuts_Total_Number_mm-1):
-               print_lined_string_File([" ","CONSECUTIVE CUTS"],Output_Summary_File_mm);
-               Output_Summary_Latex_File_mm.write("\nCONSECUTIVE CUT\n");
+   
+               #print_lined_string(["","RECURSIVE CUTS"])
+               print_lined_string_File([" ","RECURSIVE CUTS"],Output_Summary_File_mm);
+               Output_Summary_Latex_File_mm.write("\nRECURSIVE CUTS\n");
                cfg_file_1=[Cfg_FileName_Table_mm[0][Cut_Number_mm][n_sample],Cfg_FileName_Table_mm[0][Cut_Number_mm][Sample_Total_Number_mm+n_sample]];
                #def run_log(sampleNumber,cutNumber,ctype,total_cutNumber,Significance_Table_mm_log,input_cfg_file,latex_file,Output_Summary_File_mm,in_cc_dir):
                Significance_Table_mm=run_log(n_sample,Cut_Number_mm,1,Cuts_Total_Number_mm,Significance_Table_mm,cfg_file_1,Output_Summary_Latex_File_mm,Output_Summary_File_mm,final_dir1,TTBar_Scale_Factor_mm)
             
-                          
+            
+            
+            
+            
+               
+               #print_lined_string(["","SINGLE CUT"])
                print_lined_string_File([" ","SINGLE CUT"],Output_Summary_File_mm);
                Output_Summary_Latex_File_mm.write("\nSINGLE CUT\n");
                cfg_file_2=[Cfg_FileName_Table_mm[1][Cut_Number_mm][n_sample],Cfg_FileName_Table_mm[1][Cut_Number_mm][Sample_Total_Number_mm+n_sample]];
@@ -1958,15 +1853,8 @@ if __name__ == '__main__':
             
             
             else:
-               print "\n\n  -----------------------"
-               print " |                       |"
-               print " |     ONLY ONE CUT      |"
-               print " |                       |"
-               print "  -----------------------\n\n"
-               Output_Summary_File_mm.write("\n-------------------------------------------------------------------------------\n");
-               Output_Summary_File_mm.write("ONLY ONE CUT");
-               Output_Summary_File_mm.write("\n-------------------------------------------------------------------------------");    
-               Output_Summary_Latex_File_mm.write("\nONLY ONE CUT\n");
+               #print_boxed_string(["ONLY ONE CUT"])
+               print_boxed_string_File(["ONLY ONE CUT"],Output_Summary_File_mm);
                cfg_file_1=[Cfg_FileName_Table_mm[0][Cut_Number_mm][n_sample],Cfg_FileName_Table_mm[0][Cut_Number_mm][Sample_Total_Number_mm+n_sample]];
                #def run_log(sampleNumber,cutNumber,ctype,total_cutNumber,Significance_Table_mm_log,input_cfg_file,latex_file,Output_Summary_File_mm,in_cc_dir):
                Significance_Table_mm=run_log(n_sample,Cut_Number_mm,1,Cuts_Total_Number_mm,Significance_Table_mm,cfg_file_1,Output_Summary_Latex_File_mm,Output_Summary_File_mm,final_dir1,TTBar_Scale_Factor_mm)        
@@ -2065,12 +1953,26 @@ if __name__ == '__main__':
     
     ### Slides with Plots
     #def latex_graph_include(Sample_gi,Mass_gi,ScaleFactor_gi,ofile_gi,FrameSubTitle_gi)
-    Output_ScaleFactor_File_mm.write("Numero Sample\n");
-    Output_ScaleFactor_File_mm.write("%.0f"%Sample_Total_Number_mm);
+    #Output_Efficiency_File_mm.write("Numero Sample\n");
+    #Output_Efficiency_File_mm.write("%.0f"%Sample_Total_Number_mm);
     nsample=0;
     for nsample in range(Sample_Total_Number_mm):
+        
+        Frame_tmp="\\framesubtitle{%s-channel \hspace{6pt} Ntuple: "%(channel_latex_mm)+Ntuple_Name_texttt+" \hspace{6pt} W+Jets ScaleFactor: %s"%(Scale_W_Factor_global_str)+" \hspace{6pt} TTBar ScaleFactor: %s"%(TTBar_Scale_Factor_mm_str);
+        latex_FrameSubtitle=Frame_tmp+frameSubTitle_AD_string+"}\n";
+        '''
+        latex_FrameTitle="Basic Cuts Only";
+        Output_Beamer_Latex_File_mm.write("\graphicspath{{/home/matteo/Tesi/LxPlus_Matteo/ControlPlots/17gen/TTBarCR_%s/ScaleW%s_ScaleT%s/Consecutive_Cuts_%.0f/}}\n"%(ordering,Scale_W_Factor_global_str,Scale_T_Factor_global_str,(Cuts_Total_Number_mm-2)));
+        latex_graph_include(sampleValue[nsample][0],sampleValue[nsample][2],sampleValue[nsample][5],Output_Beamer_Latex_File_mm,latex_FrameSubtitle,latex_FrameTitle);
+         
+        
         latex_FrameTitle="Basic Cuts and ONE b-Tagging";
-        Output_Beamer_Latex_File_mm.write("\graphicspath{{/home/matteo/Tesi/LxPlus_Matteo/ControlPlots/17gen/TTBarCR_SF/ScaleW%s_ScaleT%s/Consecutive_Cuts_%.0f/}}\n"%(Scale_W_Factor_global_str,Scale_T_Factor_global_str,(Cuts_Total_Number_mm)));
+        Output_Beamer_Latex_File_mm.write("\graphicspath{{/home/matteo/Tesi/LxPlus_Matteo/ControlPlots/17gen/TTBarCR_%s/ScaleW%s_ScaleT%s/Consecutive_Cuts_%.0f/}}\n"%(ordering,Scale_W_Factor_global_str,Scale_T_Factor_global_str,(Cuts_Total_Number_mm-1)));
+        latex_graph_include(sampleValue[nsample][0],sampleValue[nsample][2],sampleValue[nsample][5],Output_Beamer_Latex_File_mm,latex_FrameSubtitle,latex_FrameTitle);
+        '''
+        
+        latex_FrameTitle="Basic Cuts and TWO b-Tagging";
+        Output_Beamer_Latex_File_mm.write("\graphicspath{{/home/matteo/Tesi/LxPlus_Matteo/ControlPlots/20gen/SignalRegion/Consecutive_Cuts_%.0f/}}\n"%(Cuts_Total_Number_mm));
         latex_graph_include(sampleValue[nsample][0],sampleValue[nsample][2],sampleValue[nsample][5],Output_Beamer_Latex_File_mm,latex_FrameSubtitle,latex_FrameTitle);
         
 
@@ -2084,39 +1986,72 @@ if __name__ == '__main__':
         #####################
         ### CALCOLO INCERTEZZE MEDIANTE PROPAGAZIONE DEGLI ERRORI ASSUMENDO SQRT(N) COME ERRORE SUI CONTEGGI
         #####################        
-        
-        N_TTBar_mc=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][2];
-        N_STop_mc=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][6];
-        N_WJets_mc=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][0];
-        N_VV_mc=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][4];
-        N_data=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][number_Events_type+3];
-        N_mc=N_TTBar_mc+N_STop_mc;
-        
-        Scale_t_factor_global=N_data/N_mc;
-        
-        k12_factor=0.834045;
-        k21_factor=0.771864;
-        Sigma_k12=0.122555
-        Sigma_k21=0.114608;
-        
-        k_factor_global=(k12_factor+k21_factor)/2;
-        Sigma_rel_k=SumSquareRelErrors([(Sigma_k12/k12_factor),(Sigma_k21/k21_factor)]);
-        beta_ScaleFactor=Scale_t_factor_global/k_factor_global;
-        
+        '''
+        Sigma_rel_simulatedMC_WJets=1/TMath.Sqrt(N_simulatedMC_WJets_global);
+        Sigma_rel_simulatedMC_VV=1/TMath.Sqrt(N_simulatedMC_VV_global);
+        Sigma_rel_simulatedMC_TTBar=1/TMath.Sqrt(N_simulatedMC_TTBar_global);
+        Sigma_rel_simulatedMC_STop=1/TMath.Sqrt(N_simulatedMC_STop_global);
+
+        Sigma_rel_xsec_TTBar_global=0.05;
+        Sigma_rel_xsec_STop_global=0.05;
+        Sigma_rel_xsec_VV_global=0.03;
+    
+    
         Sigma_rel_WJets=SumSquareRelErrors([Sigma_rel_simulatedMC_WJets]);
         Sigma_rel_VV=SumSquareRelErrors([Sigma_rel_simulatedMC_VV,Sigma_rel_xsec_VV_global]);
         Sigma_rel_TTBar=SumSquareRelErrors([Sigma_rel_simulatedMC_TTBar,Sigma_rel_xsec_TTBar_global]);
         Sigma_rel_STop=SumSquareRelErrors([Sigma_rel_simulatedMC_STop,Sigma_rel_xsec_STop_global]);
-        Sigma_rel_data=1/(TMath.Sqrt(Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][number_Events_type+2]));
+       
         
-        Sigma_rel_N_MC=SumSquareRelErrors([Sigma_rel_TTBar,Sigma_rel_STop]);
-        Sigma_rel_N_data=SumSquareRelErrors([Sigma_rel_WJets, Sigma_rel_VV,Sigma_rel_data]);
-        Sigma_rel_T_ScaleFactor=SumSquareRelErrors([Sigma_rel_N_data,Sigma_rel_N_MC]);
         
-        Sigma_beta_ScaleFactor=SumSquareRelErrors([Sigma_rel_T_ScaleFactor,Sigma_rel_k])*beta_ScaleFactor;
-
+        N_b_TTBar_mc=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][2];
+        N_b_STop_mc=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][6];
+        N_b_WJets_mc=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][0];
+        N_b_VV_mc=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][4];
+        N_b_data=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][number_Events_type+3];
+        N_b_mc=N_b_TTBar_mc+N_b_STop_mc;
         
-        efficence_result_string=["RISULTATI SCALE FACTOR",
+        Sigma_rel_n_b_data=SumSquareRelErrors([(1/TMath.Sqrt(N_b_data)),Sigma_rel_WJets,Sigma_rel_VV]);
+        Sigma_rel_n_b_MC=SumSquareRelErrors([Sigma_rel_TTBar,Sigma_rel_STop]);
+        
+        #sigma_n_b_data=TMath.Sqrt(N_b_data+N_b_WJets_mc+N_b_VV_mc);
+        #sigma_n_b_mc=TMath.Sqrt(N_b_TTBar_mc+N_b_STop_mc);
+        
+        N_a_TTBar_mc=Significance_Table_mm[0][Cuts_Total_Number_mm-2][nsample][2];
+        N_a_STop_mc=Significance_Table_mm[0][Cuts_Total_Number_mm-2][nsample][6];
+        N_a_WJets_mc=Significance_Table_mm[0][Cuts_Total_Number_mm-2][nsample][0];
+        N_a_VV_mc=Significance_Table_mm[0][Cuts_Total_Number_mm-2][nsample][4];
+        N_a_data=Significance_Table_mm[0][Cuts_Total_Number_mm-2][nsample][number_Events_type+3];
+        N_a_mc=N_a_TTBar_mc+N_a_STop_mc;
+        
+        Sigma_rel_n_a_data=SumSquareRelErrors([(1/TMath.Sqrt(N_a_data)),Sigma_rel_WJets,Sigma_rel_VV]);
+        Sigma_rel_n_a_MC=SumSquareRelErrors([Sigma_rel_TTBar,Sigma_rel_STop]);
+        
+        epsilon_MC=N_b_mc/N_a_mc;
+        epsilon_data=N_b_data/N_a_data;
+        k_factor=epsilon_data/epsilon_MC;
+        
+        
+        Sigma_rel_epsilon_data=SumSquareRelErrors([Sigma_rel_n_a_data,Sigma_rel_n_b_data]);
+        Sigma_rel_epsilon_MC=SumSquareRelErrors([Sigma_rel_n_a_MC,Sigma_rel_n_b_MC]);
+        
+        Sigma_epsilon_data=Sigma_rel_epsilon_data*epsilon_data;
+        Sigma_epsilon_MC=Sigma_rel_epsilon_MC*epsilon_MC;
+        #sigma_n_a_data=TMath.Sqrt(N_a_data+N_a_WJets_mc+N_a_VV_mc);
+        #sigma_n_a_mc=TMath.Sqrt(N_a_TTBar_mc+N_a_STop_mc);
+        
+        #sigma2_rel_epsilon_data=TMath.Power(((sigma_n_a_data)/(N_a_data)),2)+TMath.Power(((sigma_n_b_data)/(N_b_data)),2);
+        #sigma2_rel_epsilon_mc=TMath.Power(((sigma_n_a_mc)/(N_a_mc)),2)+TMath.Power(((sigma_n_b_mc)/(N_b_mc)),2);
+        
+        Sigma_k=SumSquareRelErrors([Sigma_rel_epsilon_data,Sigma_rel_epsilon_MC])*k_factor;
+        
+        
+        Scale_t_factor=N_b_data/N_b_mc;
+        Sigma_Scale_t_factor=SumSquareRelErrors([Sigma_rel_n_b_data,Sigma_rel_n_b_MC])*Scale_t_factor;
+        
+        #sigma_scale_t_factor=TMath.Sqrt((1/N_b_data)+(1/N_b_mc))*scale_t_factor;
+        
+        efficence_result_string=["RISULTATI EFFICIENZA",
                           " ",
                           " ",
                           "Sample: %s"%sampleValue[nsample][0],
@@ -2124,47 +2059,62 @@ if __name__ == '__main__':
                           "Mass: %.0f"%sampleValue[nsample][2],
                           " ",
                           " ",
-                          "N MC: %f"%N_mc,
+                          "Na MC: %f"%N_a_mc,
                           " ",
-                          "N DATA: %f"%N_data,
+                          "Nb MC: %f"%N_b_mc,
+                          " ",
+                          "Na DATA: %f"%N_a_data,
+                          " ",
+                          "Nb DATA: %f"%N_b_data,
+                          " ",
+                          "Efficienza MC: %f"%epsilon_MC,
+                          " ",
+                          "SigmaEfficienza MC: %f"%Sigma_epsilon_MC,
+                          " ",
+                          "Efficienza DATA: %f"%epsilon_data,
+                          " ",
+                          "SigmaEfficienza DATA: %f"%Sigma_epsilon_data,
+                          " ",
+                          "K-Factor: %f"%k_factor,
+                          " ",
+                          "SigmaK: %f"%Sigma_k,
                           " ",
                           " ",
-                          "Scale Factor TTBar: %f"%Scale_t_factor_global,
+                          "Scale Factor TTBar: %f"%Scale_t_factor,
                           " ",
-                          "Beta ScaleFactor TTBar: %f"%beta_ScaleFactor,
-                          "Sigma Beta ScaleFactor: %f"%Sigma_beta_ScaleFactor];
+                          "Sigma ScaleFactor TTBar: %f"%Sigma_Scale_t_factor];
         
      
         print_boxed_string_File(efficence_result_string,Output_Summary_File_mm);
-        '''
-        # Save in the Output_ScaleFactor_File_mm
-        Output_ScaleFactor_File_mm.write("\n\n%s"%sampleValue[nsample][0]); 		# 0 SAMPLE
+        
+        # Save in the Output_Efficiency_File_mm
+        Output_Efficiency_File_mm.write("\n\n%s"%sampleValue[nsample][0]); 		# 0 SAMPLE
                           
-        Output_ScaleFactor_File_mm.write("\n%.0f"%sampleValue[nsample][2]); 		# 1 MASS
+        Output_Efficiency_File_mm.write("\n%.0f"%sampleValue[nsample][2]); 		# 1 MASS
 
-        Output_ScaleFactor_File_mm.write("\n%f"%N_a_mc); 						# 2 N_A_MC
+        Output_Efficiency_File_mm.write("\n%f"%N_a_mc); 						# 2 N_A_MC
 
-        Output_ScaleFactor_File_mm.write("\n%f"%N_b_mc); 						# 3 N_B_MC
+        Output_Efficiency_File_mm.write("\n%f"%N_b_mc); 						# 3 N_B_MC
 
-        Output_ScaleFactor_File_mm.write("\n%f"%N_a_data); 						# 4 N_A_DATA
+        Output_Efficiency_File_mm.write("\n%f"%N_a_data); 						# 4 N_A_DATA
 
-        Output_ScaleFactor_File_mm.write("\n%f"%N_b_data); 						# 5 N_B_DATA
+        Output_Efficiency_File_mm.write("\n%f"%N_b_data); 						# 5 N_B_DATA
 
-        Output_ScaleFactor_File_mm.write("\n%f"%epsilon_MC); 					# 6 EPSILON_MC
+        Output_Efficiency_File_mm.write("\n%f"%epsilon_MC); 					# 6 EPSILON_MC
 
-        Output_ScaleFactor_File_mm.write("\n%f"%Sigma_epsilon_MC); 				# 7 SIGMA_EPSILON_MC
+        Output_Efficiency_File_mm.write("\n%f"%Sigma_epsilon_MC); 				# 7 SIGMA_EPSILON_MC
 
-        Output_ScaleFactor_File_mm.write("\n%f"%epsilon_data); 					# 8 EPSILON_DATA
+        Output_Efficiency_File_mm.write("\n%f"%epsilon_data); 					# 8 EPSILON_DATA
 
-        Output_ScaleFactor_File_mm.write("\n%f"%Sigma_epsilon_data); 			# 9 SIGMA_EPSILON_DATA
+        Output_Efficiency_File_mm.write("\n%f"%Sigma_epsilon_data); 			# 9 SIGMA_EPSILON_DATA
 
-        Output_ScaleFactor_File_mm.write("\n%f"%k_factor); 						# 10 K-FACTOR
+        Output_Efficiency_File_mm.write("\n%f"%k_factor); 						# 10 K-FACTOR
 
-        Output_ScaleFactor_File_mm.write("\n%f"%Sigma_k); 						# 11 SIGMA_K_FACTOR
+        Output_Efficiency_File_mm.write("\n%f"%Sigma_k); 						# 11 SIGMA_K_FACTOR
 
-        Output_ScaleFactor_File_mm.write("\n%f"%Scale_t_factor); 				# 12 SF TTBAR
+        Output_Efficiency_File_mm.write("\n%f"%Scale_t_factor); 				# 12 SF TTBAR
 
-        Output_ScaleFactor_File_mm.write("\n%f"%Sigma_Scale_t_factor); 			# 13  SIGMA_SF_TTBAR
+        Output_Efficiency_File_mm.write("\n%f"%Sigma_Scale_t_factor); 			# 13  SIGMA_SF_TTBAR
         
         
         
@@ -2203,7 +2153,144 @@ if __name__ == '__main__':
         
         Output_Beamer_Latex_File_mm.write("\end{frame}\n");
         '''
+        Sigma_rel_simulatedMC_WJets=1/TMath.Sqrt(N_simulatedMC_WJets_global);
+        Sigma_rel_simulatedMC_VV=1/TMath.Sqrt(N_simulatedMC_VV_global);
+        Sigma_rel_simulatedMC_TTBar=1/TMath.Sqrt(N_simulatedMC_TTBar_global);
+        Sigma_rel_simulatedMC_STop=1/TMath.Sqrt(N_simulatedMC_STop_global);
+
+        Sigma_rel_xsec_TTBar_global=0.05;
+        Sigma_rel_xsec_STop_global=0.05;
+        Sigma_rel_xsec_VV_global=0.03;
     
+    
+        Sigma_rel_WJets=SumSquareRelErrors([Sigma_rel_simulatedMC_WJets]);
+        Sigma_rel_VV=SumSquareRelErrors([Sigma_rel_simulatedMC_VV,Sigma_rel_xsec_VV_global]);
+        Sigma_rel_TTBar=SumSquareRelErrors([Sigma_rel_simulatedMC_TTBar,Sigma_rel_xsec_TTBar_global]);
+        Sigma_rel_STop=SumSquareRelErrors([Sigma_rel_simulatedMC_STop,Sigma_rel_xsec_STop_global]);       
+        
+        
+        
+        
+        
+        N_TTBar_mc=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][2];
+        N_STop_mc=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][6];
+        N_WJets_mc=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][0];
+        N_VV_mc=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][4];
+        N_data=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][number_Events_type+3];
+        N_mc=N_WJets_mc;
+        
+        Scale_W_control_factor=N_data/N_mc;
+        
+        Sigma_rel_WJets=SumSquareRelErrors([Sigma_rel_simulatedMC_WJets]);
+        Sigma_rel_VV=SumSquareRelErrors([Sigma_rel_simulatedMC_VV,Sigma_rel_xsec_VV_global]);
+        Sigma_rel_TTBar=SumSquareRelErrors([Sigma_rel_simulatedMC_TTBar,Sigma_rel_xsec_TTBar_global]);
+        Sigma_rel_STop=SumSquareRelErrors([Sigma_rel_simulatedMC_STop,Sigma_rel_xsec_STop_global]);
+        Sigma_rel_data=1/(TMath.Sqrt(Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][number_Events_type+2]));
+        
+        Sigma_rel_N_MC=Sigma_rel_WJets;
+        Sigma_rel_N_data=SumSquareRelErrors([Sigma_rel_STop,Sigma_rel_TTBar, Sigma_rel_VV,Sigma_rel_data]);
+        Sigma_W_control_ScaleFactor=SumSquareRelErrors([Sigma_rel_N_data,Sigma_rel_N_MC])*Scale_W_control_factor;
+        
+
+        
+        efficence_result_string=["RISULTATI SCALE FACTOR WJETS",
+                          " ",
+                          " ",
+                          "Sample: %s"%sampleValue[nsample][0],
+                          " ",
+                          "Mass: %.0f"%sampleValue[nsample][2],
+                          " ",
+                          "Ended SignalRegion ControlPlots"];
+        
+     
+        print_boxed_string_File(efficence_result_string,Output_Summary_File_mm);
+        '''
+        # Save in the Output_Efficiency_File_mm
+        Output_Efficiency_File_mm.write("\n\n%s"%sampleValue[nsample][0]); 		# 0 SAMPLE
+                          
+        Output_Efficiency_File_mm.write("\n%.0f"%sampleValue[nsample][2]); 		# 1 MASS
+
+        Output_Efficiency_File_mm.write("\n%f"%N_a_mc); 						# 2 N_A_MC
+
+        Output_Efficiency_File_mm.write("\n%f"%N_b_mc); 						# 3 N_B_MC
+
+        Output_Efficiency_File_mm.write("\n%f"%N_a_data); 						# 4 N_A_DATA
+
+        Output_Efficiency_File_mm.write("\n%f"%N_b_data); 						# 5 N_B_DATA
+
+        Output_Efficiency_File_mm.write("\n%f"%epsilon_MC); 					# 6 EPSILON_MC
+
+        Output_Efficiency_File_mm.write("\n%f"%Sigma_epsilon_MC); 				# 7 SIGMA_EPSILON_MC
+
+        Output_Efficiency_File_mm.write("\n%f"%epsilon_data); 					# 8 EPSILON_DATA
+
+        Output_Efficiency_File_mm.write("\n%f"%Sigma_epsilon_data); 			# 9 SIGMA_EPSILON_DATA
+
+        Output_Efficiency_File_mm.write("\n%f"%k_factor); 						# 10 K-FACTOR
+
+        Output_Efficiency_File_mm.write("\n%f"%Sigma_k); 						# 11 SIGMA_K_FACTOR
+
+        Output_Efficiency_File_mm.write("\n%f"%Scale_t_factor); 				# 12 SF TTBAR
+
+        Output_Efficiency_File_mm.write("\n%f"%Sigma_Scale_t_factor); 			# 13  SIGMA_SF_TTBAR
+        
+        
+        
+        Output_Beamer_Latex_File_mm.write("\n\n\n");
+        Output_Beamer_Latex_File_mm.write("\changefontsizes{9pt}\n");
+        Output_Beamer_Latex_File_mm.write("\\begin{frame}\n");
+        Output_Beamer_Latex_File_mm.write("\\frametitle{Control Plots - Efficience and K-factor %s%.0f }\n"%(sampleValue[nsample][0],sampleValue[nsample][2]));   
+        Output_Beamer_Latex_File_mm.write(latex_FrameSubtitle);
+        #Output_Beamer_Latex_File_mm.write("\changefontsizes{7pt}\n");
+        Output_Beamer_Latex_File_mm.write("\\begin{table}[H]\n");
+        Output_Beamer_Latex_File_mm.write("\\begin{center}\n");
+        Output_Beamer_Latex_File_mm.write("\\begin{tabular}{|M{15pt}|M{50pt}|M{50pt}|}\n");
+        #Output_Beamer_Latex_File_mm.write("\hline \multicolumn{2}{|c|}{Single Cut} \\\ \n");
+        Output_Beamer_Latex_File_mm.write("\hline  & MC & DATA \\\ \n");
+        Output_Beamer_Latex_File_mm.write("\hline $N_a$ & %f & %f \\\ \n"%(N_a_mc,N_a_data));
+        Output_Beamer_Latex_File_mm.write("\hline $N_b$ & %f & %f \\\ \n"%(N_b_mc,N_b_data));
+        Output_Beamer_Latex_File_mm.write("\hline\n");
+        Output_Beamer_Latex_File_mm.write("\end{tabular}\n");
+        #ofile.write("\\caption{Significanza in funzione delle Input Variables for Cut Optimization per diversi valori di risonanza}\n");
+        Output_Beamer_Latex_File_mm.write("\end{center}\n");
+        Output_Beamer_Latex_File_mm.write("\end{table}\n");
+        Output_Beamer_Latex_File_mm.write("\n");
+        Output_Beamer_Latex_File_mm.write("\\begin{itemize}\n");
+        Output_Beamer_Latex_File_mm.write("\item $\epsilon_{data}=%f$\n"%epsilon_data);
+        Output_Beamer_Latex_File_mm.write("\item $\epsilon_{MC}=%f$\n"%epsilon_MC);
+        Output_Beamer_Latex_File_mm.write("\item $k=\dfrac{{\epsilon}_{data}}{{\epsilon}_{MC}}=%f\pm %f$\n"%(k_factor,Sigma_k));
+        Output_Beamer_Latex_File_mm.write("\item $S=\dfrac{{N}_{data}}{{N}_{MC}}=%f\pm %f$\n"%(Scale_t_factor,Sigma_Scale_t_factor));        
+        Output_Beamer_Latex_File_mm.write("\end{itemize}\n");
+        Output_Beamer_Latex_File_mm.write("\n");
+        #Output_Beamer_Latex_File_mm.write("\n");
+        #Output_Beamer_Latex_File_mm.write("\n");
+        #Output_Beamer_Latex_File_mm.write("\n");
+        #Output_Beamer_Latex_File_mm.write("\n");
+        
+        
+        
+        Output_Beamer_Latex_File_mm.write("\end{frame}\n");
+        
+        '''
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
     # Slides with Cuts
     
     ## Consecutive Cuts
@@ -2285,20 +2372,10 @@ if __name__ == '__main__':
         else:
            # Consecutive Cuts
            make_latex_table(Cuts_Total_Number_mm,Significance_Table_mm,1,nsample,Output_Beamer_Latex_File_mm,Ntuple_Name_texttt,latex_FrameSubtitle);
-        
+    
     Output_Beamer_Latex_File_mm.write("\end{document}\n");
     Output_Summary_Latex_File_mm.close()
     Output_Beamer_Latex_File_mm.close();  
     Output_Summary_File_mm.close();
-    Output_ScaleFactor_File_mm.close();
-        
-         
-        
-        
-      
-            
-            
-            
-            
-            
+    #Output_Efficiency_File_mm.close();
     
