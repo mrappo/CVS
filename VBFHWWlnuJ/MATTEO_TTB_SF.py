@@ -34,12 +34,20 @@ parser.add_option('--scalewNLO', action="store", type="float", dest="scalewNLO",
 parser.add_option('--dir', action="store", type="string", dest="dir", default="")
 parser.add_option('--nodata', action='store_true', dest='nodata', default=False)
 parser.add_option('--sampleUsed', action="store", type="string", dest="sampleUsed", default="1")
+parser.add_option('--DEtaCut', action="store", type="string", dest="DEtaCut", default="0.0")
+parser.add_option('--MjjCut', action="store", type="string", dest="MjjCut", default="0.0")
+parser.add_option('--nJetsCut', action="store", type="string", dest="nJetsCut", default="0.0")
 (options, args) = parser.parse_args()
 currentDir = os.getcwd();
 
 ###########################################################################################
 ######## GLOBAL VARIABLE DEFINITION
 ###########################################################################################
+
+DEtaCut_value=options.DEtaCut;
+MjjCut_value=options.MjjCut;
+nJetsCut_value=options.nJetsCut;
+
 
 Events_type_global=["Wjets_Pythia_Events_g",      # 0
                     "Wjets_Herwig_Events_g",      # 1
@@ -213,7 +221,13 @@ total_sample_value=[sampleValue,sampleValue_VBF];
 if (options.channel=="el" or options.channel=="em"):
      
     frameSubTitle_AD_string="\hspace{6pt} TTBarCR";
-    cuts_itemize=["deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>45 && pfMET>80 && jet_tau2tau1 < 0.6 && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>0.0001 && (jet_mass_pr > 65 && jet_mass_pr < 105 ) && vbf_maxpt_j2_bDiscriminatorCSV>0.89 && vbf_maxpt_j1_bDiscriminatorCSV>0.89"]; 
+    tmp_cut="deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>45 && pfMET>80 && jet_tau2tau1 < 0.6 && (jet_mass_pr > 65 && jet_mass_pr < 105 ) "; 
+       
+    add_cut_tmp=" && njets>%s && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>%s && vbf_maxpt_jj_m >%s"%(nJetsCut_value,DEtaCut_value,MjjCut_value);
+       
+    total_tmp_cut=tmp_cut+add_cut_tmp+"&& vbf_maxpt_j1_bDiscriminatorCSV>0.89";
+    
+    cuts_itemize=[total_tmp_cut]; 
        
 
 
@@ -666,8 +680,10 @@ def run_log(Sample_Number_ll,Cut_Number_ll,C_Type_ll,Cut_Total_Number_ll,Signifi
     STop_MC_ll=Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][6];
     WJets_MC_ll=Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][0];
     VV_MC_ll=Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][4]+Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][5];
+    Signal_gg_ll=Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][9];
+    Signal_VBF_ll=Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][10];
     
-    TTBar_data_ll=Data_ll-WJets_MC_ll-VV_MC_ll;
+    TTBar_data_ll=Data_ll-WJets_MC_ll-VV_MC_ll-Signal_VBF_ll-Signal_gg_ll;
     Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][number_Events_type+3]=TTBar_data_ll;
     
     
@@ -1259,11 +1275,12 @@ if __name__ == '__main__':
     #########################################################
     print "\n\n\n----------- Check or making directory ---------------------\n"
 
+    '''
     Ntuple_Dir_mm="output/Ntuple_%s"%(options.ntuple);
     if not os.path.isdir(Ntuple_Dir_mm):
            pd1 = subprocess.Popen(['mkdir',Ntuple_Dir_mm]);
            pd1.wait();
-
+    
 
     Lumi_Dir_mm=Ntuple_Dir_mm+"/Lumi_%s"%(Lumi_mm_str);
     if not os.path.isdir(Lumi_Dir_mm):
@@ -1271,12 +1288,13 @@ if __name__ == '__main__':
            pd2.wait();
        
 
-
+    '''
     Cuts_File_Dir_mm="cfg/DataMCComparison_InputCfgFile";
     if not os.path.isdir(Cuts_File_Dir_mm):
            pd3 = subprocess.Popen(['mkdir',Cuts_File_Dir_mm]);
            pd3.wait();
-       
+    
+    ''' 
   
     
        
@@ -1284,7 +1302,7 @@ if __name__ == '__main__':
     if not os.path.isdir(ControlP_Dir_1):
            pd4 = subprocess.Popen(['mkdir',ControlP_Dir_1]);
            pd4.wait();  
-    
+    '''
     
     ControlP_Dir_2=FileToSave_dir;
     if not os.path.isdir(ControlP_Dir_2):
@@ -1346,6 +1364,8 @@ if __name__ == '__main__':
     
     
     
+    
+    
     #########################################################
     ######### MAKE OUTPUT FILE
     #########################################################    
@@ -1368,7 +1388,22 @@ if __name__ == '__main__':
     # Make Efficiency File
     ScaleFactorTrue_file = Control_Plots_Dir_mm+"/ScaleFactorTrue.txt";
     Output_ScaleFactorTrue_File_mm=open(ScaleFactorTrue_file,'w+');
-
+    
+    
+    tmp_string=["Sample: %.12s"%(Readed_Values[0][0]),
+                "Mass: %.0f"%int(Readed_Values[0][1]),
+                " ",
+                " ",
+                "K12 %f"%k12_factor,
+                " ",
+                "Sigma K12: %f"%Sigma_k12,
+                " ",
+                "K21 %f"%k21_factor,
+                " ",
+                "Sigma K21: %f"%Sigma_k21,
+                " ",
+                "SF %f"%float(Readed_Values[0][12])];
+    print_boxed_string_File(tmp_string,Output_Summary_File_mm);
     
 
     #Scale_T_tmp=float(Readed_Values[0][10])*float(Readed_Values[1][10])*Beta_ScaleFactor_TTBar;
@@ -2007,15 +2042,64 @@ if __name__ == '__main__':
         ##################################################################################################################
         ### CALCOLO True TTBar ScaleFactor e relativa incertezza
         ##################################################################################################################       
-        
+        '''
+        "Wjets_Pythia MC Events: %f"%Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][0], # 0
+        " ",
+        "Wjets_Herwig MC Events: %f"%Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][1],# 1
+        " ",
+        "TTbar_Powegh MC Events: %f"%Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][2], # 2
+        " ",
+        "TTbar_MC MC Events: %f"%Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][3], # 3
+        " ",
+        "VV_QCD MC Events: %f"%Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][4], # 4
+        " ",
+        "WW_EWK MC Events: %f"%Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][5], # 5
+        " ",
+        "STop MC Events: %f"%Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][6], # 6
+        " ",
+        "All_bkg_Pythia MC Events: %f"%Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][7], # 7
+        " ",
+        "All_bkg_Herwig MC Events: %f"%Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][8], # 8
+        " ",
+        "Signal_gg MC Events: %f"%Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][9], # 9
+        " ",
+        "Signal_VBF MC Events: %f"%Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][10], # 10
+        " ",
+        "Data: %f"%Significance_Table_ll[Cut_Type_ll][Cut_Number_ll][Sample_Number_ll][number_Events_type+2], 
+        '''
         N_TTBar_mc=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][2];
         N_STop_mc=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][6];
         N_WJets_mc=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][0];
         N_VV_mc=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][4];
         N_data=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][number_Events_type+3];
         N_mc=N_TTBar_mc+N_STop_mc;
+        Data=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][number_Events_type+2];
         
-        Scale_t_factor_global=N_data/N_mc;
+        
+        Sigma_rel_simulatedMC_WJets=1/TMath.Sqrt(N_simulatedMC_WJets_global);
+        Sigma_rel_simulatedMC_VV=1/TMath.Sqrt(N_simulatedMC_VV_global);
+        Sigma_rel_simulatedMC_TTBar=1/TMath.Sqrt(N_simulatedMC_TTBar_global);
+        Sigma_rel_simulatedMC_STop=1/TMath.Sqrt(N_simulatedMC_STop_global);
+        
+        Sigma_rel_xsec_TTBar_global=0.05;
+        Sigma_rel_xsec_STop_global=0.05;
+        Sigma_rel_xsec_VV_global=0.03;
+        
+        Sigma_rel_data=1/TMath.Sqrt(Data);
+    
+        Sigma_rel_WJets=SumSquareRelErrors([Sigma_rel_simulatedMC_WJets]);
+        Sigma_rel_VV=SumSquareRelErrors([Sigma_rel_simulatedMC_VV,Sigma_rel_xsec_VV_global]);
+        Sigma_rel_TTBar=SumSquareRelErrors([Sigma_rel_simulatedMC_TTBar,Sigma_rel_xsec_TTBar_global]);
+        Sigma_rel_STop=SumSquareRelErrors([Sigma_rel_simulatedMC_STop,Sigma_rel_xsec_STop_global]);
+        
+        Sigma_rel_n_data=SumSquareRelErrors([Sigma_rel_data,Sigma_rel_WJets,Sigma_rel_VV]);
+        Sigma_rel_n_mc=SumSquareRelErrors([Sigma_rel_simulatedMC_STop,Sigma_rel_simulatedMC_TTBar]);
+        
+        TTB_ScaleFactor=N_data/N_mc;
+        Sigma_rel_TTB_ScaleFactor=SumSquareRelErrors([Sigma_rel_n_mc,Sigma_rel_n_data]);
+        
+        
+        
         
         '''
         k12_factor=0.834045;
@@ -2025,8 +2109,9 @@ if __name__ == '__main__':
         '''
         k_factor_global=(k12_factor+k21_factor)/2;
         Sigma_rel_k=SumSquareRelErrors([(Sigma_k12/k12_factor),(Sigma_k21/k21_factor)]);
-        beta_ScaleFactor=Scale_t_factor_global/k_factor_global;
+        beta_ScaleFactor=TTB_ScaleFactor/k_factor_global;
         
+        '''
         Sigma_rel_WJets=SumSquareRelErrors([Sigma_rel_simulatedMC_WJets]);
         Sigma_rel_VV=SumSquareRelErrors([Sigma_rel_simulatedMC_VV,Sigma_rel_xsec_VV_global]);
         Sigma_rel_TTBar=SumSquareRelErrors([Sigma_rel_simulatedMC_TTBar,Sigma_rel_xsec_TTBar_global]);
@@ -2036,11 +2121,11 @@ if __name__ == '__main__':
         Sigma_rel_N_MC=SumSquareRelErrors([Sigma_rel_TTBar,Sigma_rel_STop]);
         Sigma_rel_N_data=SumSquareRelErrors([Sigma_rel_WJets, Sigma_rel_VV,Sigma_rel_data]);
         Sigma_rel_T_ScaleFactor=SumSquareRelErrors([Sigma_rel_N_data,Sigma_rel_N_MC]);
-        
-        Sigma_beta_ScaleFactor=SumSquareRelErrors([Sigma_rel_T_ScaleFactor,Sigma_rel_k])*beta_ScaleFactor;
+        '''
+        Sigma_beta_ScaleFactor=SumSquareRelErrors([Sigma_rel_TTB_ScaleFactor,Sigma_rel_k])*beta_ScaleFactor;
 
         
-        efficence_result_string=["RISULTATI SCALE FACTOR",
+        efficence_result_string=["RISULTATI SCALE FACTOR TTBar True (Evaluated in TTBar CR)",
                           " ",
                           " ",
                           "Sample: %s"%sampleValue[nsample][0],
@@ -2053,10 +2138,12 @@ if __name__ == '__main__':
                           "N DATA: %f"%N_data,
                           " ",
                           " ",
-                          "Scale Factor TTBar: %f"%Scale_t_factor_global,
+                          "TTBar ScaleFactor: %f"%TTB_ScaleFactor,
                           " ",
-                          "Beta ScaleFactor TTBar: %f"%beta_ScaleFactor,
-                          "Sigma Beta ScaleFactor: %f"%Sigma_beta_ScaleFactor];
+                          " ",
+                          "TRUE TTBar ScaleFactor: %f"%beta_ScaleFactor,
+                          " ",
+                          "Sigma TRUE TTBar ScaleFactor: %f"%Sigma_beta_ScaleFactor];
         
      
         print_boxed_string_File(efficence_result_string,Output_Summary_File_mm);

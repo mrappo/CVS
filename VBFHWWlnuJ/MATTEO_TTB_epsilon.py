@@ -36,6 +36,9 @@ parser.add_option('--scalew', action="store", type="float", dest="scalew", defau
 parser.add_option('--nodata', action='store_true', dest='nodata', default=False)
 parser.add_option('--inverse', action='store_true', dest='inverse', default=False)
 parser.add_option('--sampleUsed', action="store", type="string", dest="sampleUsed", default="1")
+parser.add_option('--DEtaCut', action="store", type="string", dest="DEtaCut", default="0.0")
+parser.add_option('--MjjCut', action="store", type="string", dest="MjjCut", default="0.0")
+parser.add_option('--nJetsCut', action="store", type="string", dest="nJetsCut", default="0.0")
 #parser.add_option('--scaleTTB', action='store_true', dest='scaleTTB', default=False)
 (options, args) = parser.parse_args()
 currentDir = os.getcwd();
@@ -43,6 +46,11 @@ currentDir = os.getcwd();
 ###########################################################################################
 ######## GLOBAL VARIABLE DEFINITION
 ###########################################################################################
+
+DEtaCut_value=options.DEtaCut;
+MjjCut_value=options.MjjCut;
+nJetsCut_value=options.nJetsCut;
+
 
 Events_type_global=["Wjets_Pythia_Events_g",      # 0
                     "Wjets_Herwig_Events_g",      # 1
@@ -313,10 +321,22 @@ if (options.channel=="el" or options.channel=="em"):
     frameSubTitle_AD_string="\hspace{6pt} TTBar Control Region";
     
     if options.inverse:
-       cuts_itemize=["deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>45 && pfMET>80 && jet_tau2tau1 < 0.6 && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>0.0001 && (jet_mass_pr > 65 && jet_mass_pr < 105 ) ","vbf_maxpt_j2_bDiscriminatorCSV>0.89","vbf_maxpt_j1_bDiscriminatorCSV>0.89"]; 
+       tmp_cut="deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>45 && pfMET>80 && jet_tau2tau1 < 0.6  && (jet_mass_pr > 65 && jet_mass_pr < 105 )" ;
+       
+       add_cut_tmp=" && njets> %s && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) > %s && vbf_maxpt_jj_m > %s"%(nJetsCut_value,DEtaCut_value,MjjCut_value);
+       
+       total_tmp_cut=tmp_cut+add_cut_tmp;
+
+       cuts_itemize=[total_tmp_cut,"vbf_maxpt_j2_bDiscriminatorCSV>0.89","vbf_maxpt_j1_bDiscriminatorCSV>0.89"]; 
        
     else:
-       cuts_itemize=["deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>45 && pfMET>80 && jet_tau2tau1 < 0.6 && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>0.0001 && (jet_mass_pr > 65 && jet_mass_pr < 105 ) ","vbf_maxpt_j1_bDiscriminatorCSV>0.89","vbf_maxpt_j2_bDiscriminatorCSV>0.89"]; 
+       tmp_cut="deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>45 && pfMET>80 && jet_tau2tau1 < 0.6 && (jet_mass_pr > 65 && jet_mass_pr < 105 ) "; 
+       
+       add_cut_tmp=" && njets>%s && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>%s && vbf_maxpt_jj_m >%s"%(nJetsCut_value,DEtaCut_value,MjjCut_value);
+       
+       total_tmp_cut=tmp_cut+add_cut_tmp;
+
+       cuts_itemize=[total_tmp_cut,"vbf_maxpt_j1_bDiscriminatorCSV>0.89","vbf_maxpt_j2_bDiscriminatorCSV>0.89"]; 
 
    
 
@@ -1351,70 +1371,23 @@ if __name__ == '__main__':
     #########################################################
     ######### MAKING DIRECTORY
     #########################################################
-    print "\n\n\n----------- Check or making directory ---------------------\n"
 
-    Ntuple_Dir_mm="output/Ntuple_%s"%(options.ntuple);
-    if not os.path.isdir(Ntuple_Dir_mm):
-           pd1 = subprocess.Popen(['mkdir',Ntuple_Dir_mm]);
-           pd1.wait();
-
-
-    Lumi_Dir_mm=Ntuple_Dir_mm+"/Lumi_%s"%(Lumi_mm_str);
-    if not os.path.isdir(Lumi_Dir_mm):
-           pd2 = subprocess.Popen(['mkdir',Lumi_Dir_mm]);
-           pd2.wait();
-       
-
-
-    Cuts_File_Dir_mm="cfg/DataMCComparison_InputCfgFile";
-    if not os.path.isdir(Cuts_File_Dir_mm):
-           pd3 = subprocess.Popen(['mkdir',Cuts_File_Dir_mm]);
-           pd3.wait();
-       
-  
-    
-       
-    ControlP_Dir_1=Lumi_Dir_mm+"/ControlPlots";
-    if not os.path.isdir(ControlP_Dir_1):
-           pd4 = subprocess.Popen(['mkdir',ControlP_Dir_1]);
-           pd4.wait();  
-    
-    
-    ControlP_Dir_2=FileToSave_dir;
-    if not os.path.isdir(ControlP_Dir_2):
-           pd4b = subprocess.Popen(['mkdir',ControlP_Dir_2]);
-           pd4b.wait(); 
-    
     if options.inverse:
        ordering="21";
     else:
        ordering="12";
-    ControlP_Dir_3=ControlP_Dir_2+"/TTBarCR_%s"%ordering;
-    if not os.path.isdir(ControlP_Dir_3):
-           pd4b = subprocess.Popen(['mkdir',ControlP_Dir_3]);
-           pd4b.wait();
     
+ 
+    Cuts_File_Dir_mm="cfg/DataMCComparison_InputCfgFile";
+    if not os.path.isdir(Cuts_File_Dir_mm):
+           pd3 = subprocess.Popen(['mkdir',Cuts_File_Dir_mm]);
+           pd3.wait();
+
     
+    Control_Plots_Dir_mm=FileToSave_dir;
     
-    Scale_W_Factor_Dir_mm=ControlP_Dir_3;#+"/ScaleW%s_ScaleT%s"%(Scale_W_Factor_global_str,Scale_T_Factor_global);
     
 
-    if os.path.isdir(Scale_W_Factor_Dir_mm):
-       pd5 = subprocess.Popen(['rm','-r',Scale_W_Factor_Dir_mm]);
-       pd5.wait();
-    
-    pd6 = subprocess.Popen(['mkdir',Scale_W_Factor_Dir_mm]);
-    pd6.wait();
-    
-    Control_Plots_Dir_mm=Scale_W_Factor_Dir_mm;
-    
-    
-    #if not os.path.isdir(Scale_W_Factor_Dir_mm):
-    #
-    
-    #cfg_file_removal=Cuts_File_Dir_mm+"/MATTEO_*";
-    #pd7 = subprocess.Popen(['rm','-r',cfg_file_removal]);
-    #pd7.wait();
     
     
     #########################################################
@@ -1427,7 +1400,7 @@ if __name__ == '__main__':
     summary_latex_mm = Control_Plots_Dir_mm+"/Summary_latex_ControlPlots.tex";
     Output_Summary_Latex_File_mm=open(summary_latex_mm,'w+');
     
-    latex_file = Control_Plots_Dir_mm+"/Latex_ControlPlots.tex";
+    latex_file = Control_Plots_Dir_mm+"/Latex_ControlPlots_TTB_epsilon%s.tex"%ordering;
     Output_Beamer_Latex_File_mm=open(latex_file,'w+');
 
      # Make Efficiency File
@@ -1528,26 +1501,20 @@ if __name__ == '__main__':
     Output_VariableList_mm.write("############################################################################\n");
     Output_VariableList_mm.write("##  Variable						Nbin		Min		Max			Label\n");
     Output_VariableList_mm.write("############################################################################\n");
-    #Output_VariableList_mm.write("l_pt							50			0		1000		pT_{l}_(GeV)\n");
     Output_VariableList_mm.write("# nPV								25			0		50			nPV\n");
     Output_VariableList_mm.write("# l_pt							25			0		500			pT_{l}_(GeV)\n");
     Output_VariableList_mm.write("# l_eta							25			-2.5	2.5			#eta_{l}\n");
     Output_VariableList_mm.write("# l_eta							20			-2.5	2.5			#eta_{l}\n");
     Output_VariableList_mm.write("# l_phi							30			-3.14	3.14		#phi_{l}\n");
-    #Output_VariableList_mm.write("v_pt							25			200		700			pT^{W}_{l}_(GeV)\n");
-    Output_VariableList_mm.write("#v_mt								20			0		400			mT^{W}_{l}_(GeV)\n");
+    Output_VariableList_mm.write("# v_mt								20			0		400			mT^{W}_{l}_(GeV)\n");
     Output_VariableList_mm.write("# pfMET							28			0		560			MET[GeV]\n");
     Output_VariableList_mm.write("# pfMETpuppi						28			0		560			MET[GeV]\n");
-    Output_VariableList_mm.write("pfMET							50      0       1000      MET[GeV]\n");
     Output_VariableList_mm.write("# pfMETpuppi_Phi					20   -3.15      3.15	  #phi_{Puppi MET}\n");
     Output_VariableList_mm.write("# pfMET_Phi						30   -3.14      3.14	  #phi_{MET}\n");
-    #Output_VariableList_mm.write("ungroomed_jet_pt				32    100       740      pT^{AK8}_(GeV)\n");
-    #Output_VariableList_mm.write("ungroomed_jet_eta				25    -2.5      2.5        #eta^{AK8}\n");
     Output_VariableList_mm.write("# ungroomed_jet_phi				30    -3.14     3.14     #phi^{AK8}\n");
     Output_VariableList_mm.write("# ungroomed_PuppiAK8_jet_pt		32    100       740      pT^{puppi AK8}_(GeV)\n");
     Output_VariableList_mm.write("# ungroomed_PuppiAK8_jet_eta		25    -2.5      2.5        #eta^{puppi AK8}\n");
     Output_VariableList_mm.write("# ungroomed_PuppiAK8_jet_phi		30    -3.14     3.14     #phi^{puppi AK8}\n");
-    #Output_VariableList_mm.write("jet_mass_pr						15      65       105     Jet_Pruned_Mass_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# jet_mass_pr						22      40       150    Jet_Pruned_Mass_(GeV)\n");
     Output_VariableList_mm.write("# jet_mass_so						22      40       150    Jet_Softdrop_Mass_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# PuppiAK8_jet_mass_pr			22      40       150    puppiAK8_Jet_Pruned_Mass_(GeV/c^{2})\n");
@@ -1566,7 +1533,6 @@ if __name__ == '__main__':
     Output_VariableList_mm.write("# nbjets_csvm_veto                  5      0       5        N_{bjet}^{csvm}\n");
     Output_VariableList_mm.write("# nbjets_csvt_veto                  5      0       5        N_{bjet}^{csvt}\n");
     Output_VariableList_mm.write("# numberJetBin                      5      0       5        N_{jets}\n");
-    #Output_VariableList_mm.write("jet_tau2tau1                     25     0.      1.       #tau_{2}/#tau_{1}\n");
     Output_VariableList_mm.write("# PuppiAK8_jet_tau2tau1                     25     0.      1.       puppiAK8_#tau_{2}/#tau_{1}\n");
     Output_VariableList_mm.write("# jet2_pt				 25	0	500	 pT^{AK4}_{1}_(GeV)\n");
     Output_VariableList_mm.write("# jet2_btag				 25	0	1	 btag^{AK4}_{1}_(GeV)\n");
@@ -1594,25 +1560,33 @@ if __name__ == '__main__':
     Output_VariableList_mm.write("# ttb_ca8_GeneralizedECF            30     0.     0.5       Jet_Generalized_ECF\n");
     Output_VariableList_mm.write("# ttb_ca8_mu                        20    0.1      0.7       Pruned_Mass_Drop_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# ttb_mlvj                          40   400     1400       M_{WW}(GeV/c^{2})\n");
-    #Output_VariableList_mm.write("vbf_maxpt_j1_bDiscriminatorCSV  50      0       1          j1_bDiscriminator\n");
-    #Output_VariableList_mm.write("vbf_maxpt_j1_eta                50      -5      5          #eta_{j1}\n");
-    #Output_VariableList_mm.write("vbf_maxpt_j1_pt                 50      0       300        pT_{j1}_(GeV)\n");
     Output_VariableList_mm.write("# vbf_maxpt_j1_QGLikelihood       50      0       1          j1_QGLikelihood\n");
-    Output_VariableList_mm.write("vbf_maxpt_j2_bDiscriminatorCSV  50      0       1          j2_bDiscriminator\n");
-    #Output_VariableList_mm.write("vbf_maxpt_j2_eta                50      -5      5          #eta_{j2}\n");
-    #Output_VariableList_mm.write("vbf_maxpt_j2_pt                 50      0       300        pT_{j2}_(GeV)\n");
     Output_VariableList_mm.write("# vbf_maxpt_j2_QGLikelihood       50      0       1          j2_QGLikelihood\n");
     Output_VariableList_mm.write("abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) 35    0       9     #Delta#eta_{jj}\n");
-    #Output_VariableList_mm.write("vbf_maxpt_jj_m                  40      0       1500        M_{jj}_(GeV/c^{2})\n");
-    Output_VariableList_mm.write("#vbf_maxpt_jj_phi                50      -3.14   3.14       #phi_{jj}\n");
-    #Output_VariableList_mm.write("vbf_maxpt_jj_eta                30      -4.7       4.7     #eta_{jj}\n");
     Output_VariableList_mm.write("# mass_ungroomedjet_closerjet      30      80     400         M_{top}^{had}\n");
     Output_VariableList_mm.write("# mass_leptonic_closerjet          30      100     400   	    M_{top}^{lep}\n");
     Output_VariableList_mm.write("#jet_tau2tau1                    30       0.1       1.0          #tau_{2}/#tau_{1}\n");
-    #Output_VariableList_mm.write("deltaR_lak8jet                 50        0.1       5          #DeltaR\n");
-    #Output_VariableList_mm.write("deltaphi_METak8jet             50			-3.14	3.14		#Delta#phi_{met}\n");
-    #Output_VariableList_mm.write("deltaphi_Vak8jet               50			-3.14	3.14		#Delta#phi_{Wlep}\n");
-    
+    '''
+    Output_VariableList_mm.write("deltaR_lak8jet                 50        0.1       5          #DeltaR\n");
+    Output_VariableList_mm.write("deltaphi_METak8jet             50			-3.14	3.14		#Delta#phi_{met}\n");
+    Output_VariableList_mm.write("deltaphi_Vak8jet               50			-3.14	3.14		#Delta#phi_{Wlep}\n");
+    Output_VariableList_mm.write("vbf_maxpt_jj_m                  40      0       1500        M_{jj}_(GeV/c^{2})\n");
+    Output_VariableList_mm.write("#vbf_maxpt_jj_phi                50      -3.14   3.14       #phi_{jj}\n");
+    Output_VariableList_mm.write("vbf_maxpt_jj_eta                30      -4.7       4.7     #eta_{jj}\n");
+    Output_VariableList_mm.write("vbf_maxpt_j2_bDiscriminatorCSV  50      0       1          j2_bDiscriminator\n");
+    Output_VariableList_mm.write("vbf_maxpt_j2_eta                50      -5      5          #eta_{j2}\n");
+    Output_VariableList_mm.write("vbf_maxpt_j2_pt                 50      0       300        pT_{j2}_(GeV)\n");
+    Output_VariableList_mm.write("vbf_maxpt_j1_bDiscriminatorCSV  50      0       1          j1_bDiscriminator\n");
+    Output_VariableList_mm.write("vbf_maxpt_j1_eta                50      -5      5          #eta_{j1}\n");
+    Output_VariableList_mm.write("vbf_maxpt_j1_pt                 50      0       300        pT_{j1}_(GeV)\n");
+    Output_VariableList_mm.write("jet_tau2tau1                     25     0.      1.       #tau_{2}/#tau_{1}\n");
+    Output_VariableList_mm.write("jet_mass_pr						15      65       105     Jet_Pruned_Mass_(GeV/c^{2})\n");
+    Output_VariableList_mm.write("ungroomed_jet_pt				32    100       740      pT^{AK8}_(GeV)\n");
+    Output_VariableList_mm.write("ungroomed_jet_eta				25    -2.5      2.5        #eta^{AK8}\n");
+    Output_VariableList_mm.write("pfMET							50      0       1000      MET[GeV]\n");
+    Output_VariableList_mm.write("v_pt							25			200		700			pT^{W}_{l}_(GeV)\n");
+    Output_VariableList_mm.write("l_pt							50			0		1000		pT_{l}_(GeV)\n");
+    '''    
     Output_VariableList_mm.close();
     # Make InputFile and SampleListFile
     Ntuple_mm=options.ntuple;       

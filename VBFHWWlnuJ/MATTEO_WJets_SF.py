@@ -35,7 +35,9 @@ parser.add_option('--nodata', action='store_true', dest='nodata', default=False)
 parser.add_option('--sampleUsed', action="store", type="string", dest="sampleUsed", default="1")
 parser.add_option('--sumFile', action="store", type="string", dest="sumFile", default="output.txt")
 parser.add_option('--dir', action="store", type="string", dest="dir", default="")
-
+parser.add_option('--DEtaCut', action="store", type="string", dest="DEtaCut", default="0.0")
+parser.add_option('--MjjCut', action="store", type="string", dest="MjjCut", default="0.0")
+parser.add_option('--nJetsCut', action="store", type="string", dest="nJetsCut", default="0.0")
 
 (options, args) = parser.parse_args()
 currentDir = os.getcwd();
@@ -43,6 +45,13 @@ currentDir = os.getcwd();
 ###########################################################################################
 ######## GLOBAL VARIABLE DEFINITION
 ###########################################################################################
+
+
+DEtaCut_value=options.DEtaCut;
+MjjCut_value=options.MjjCut;
+nJetsCut_value=options.nJetsCut;
+
+
 
 Events_type_global=["Wjets_Pythia_Events_g",      # 0
                     "Wjets_Herwig_Events_g",      # 1
@@ -248,7 +257,12 @@ Cuts For Significance Optimization:
 if (options.channel=="el" or options.channel=="em"):
   
     frameSubTitle_AD_string="\hspace{6pt} W+Jets SideBand";
-    cuts_itemize=["deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>45 && pfMET>80 && jet_tau2tau1 < 0.6 && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>0.0001  && nBTagJet_medium==0 && vbf_maxpt_j1_bDiscriminatorCSV<0.89 && vbf_maxpt_j2_bDiscriminatorCSV<0.89 && ((jet_mass_pr > 40 && jet_mass_pr < 65 )  || ( jet_mass_pr > 135 && jet_mass_pr < 150))"]; 
+    tmp_cut="deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>45 && pfMET>80 && jet_tau2tau1 < 0.6 && ((jet_mass_pr > 40 && jet_mass_pr < 65 )  || ( jet_mass_pr > 135 && jet_mass_pr < 150))"; 
+       
+    add_cut_tmp=" && njets>%s && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>%s && vbf_maxpt_jj_m >%s"%(nJetsCut_value,DEtaCut_value,MjjCut_value);
+       
+    total_tmp_cut=tmp_cut+add_cut_tmp+"&& nBTagJet_medium==0 && vbf_maxpt_j1_bDiscriminatorCSV<0.89 && vbf_maxpt_j2_bDiscriminatorCSV<0.89 ";
+    cuts_itemize=[total_tmp_cut]; 
 
 
 
@@ -1288,14 +1302,23 @@ if __name__ == '__main__':
     Sigma_epsilon_21_data=float(InputValueVector[5]);#0.025842;
     Sigma_epsilon_12_MC=float(InputValueVector[6]);#0.021647;
     Sigma_epsilon_21_MC=float(InputValueVector[7]);#0.030504;
-
+    
+    Sigma_rel_epsilon_12_data=Sigma_epsilon_12_data/epsilon_12_data;
+    Sigma_rel_epsilon_21_data=Sigma_epsilon_21_data/epsilon_21_data;
+    Sigma_rel_epsilon_12_MC=Sigma_epsilon_12_MC/epsilon_12_MC;
+    Sigma_rel_epsilon_21_MC=Sigma_epsilon_21_MC/epsilon_21_MC;
     Beta_ScaleFactor_TTBar=float(InputValueVector[8]);#0.886664;
     Sigma_Beta_ScaleFactor=float(InputValueVector[9]);#0.200185;
+    Sigma_rel_Beta_ScaleFactor=Sigma_Beta_ScaleFactor/Beta_ScaleFactor_TTBar;
 
     B_Tagging_Correction_Factor=(1-epsilon_12_data)*(1-epsilon_21_data)/((1-epsilon_12_MC)*(1-epsilon_21_MC));
-
-    Scale_T_Factor_global=Beta_ScaleFactor_TTBar*B_Tagging_Correction_Factor;
+    Sigma_rel_B_Tagging_Correction_Factor=SumSquareRelErrors([Sigma_rel_epsilon_12_data,Sigma_rel_epsilon_21_data,Sigma_rel_epsilon_12_MC,Sigma_rel_epsilon_21_MC]);
     
+    Sigma_B_Tagging_Correction_Factor=Sigma_rel_B_Tagging_Correction_Factor*B_Tagging_Correction_Factor;
+    
+    
+    Scale_T_Factor_global=Beta_ScaleFactor_TTBar*B_Tagging_Correction_Factor;
+    Sigma_Scale_T_Factor_global=Scale_T_Factor_global*SumSquareRelErrors([Sigma_rel_B_Tagging_Correction_Factor,Sigma_rel_Beta_ScaleFactor]);
     
     
     
@@ -1306,7 +1329,7 @@ if __name__ == '__main__':
     ######### MAKING DIRECTORY
     #########################################################
     print "\n\n\n----------- Check or making directory ---------------------\n"
-
+    '''
     Ntuple_Dir_mm="output/Ntuple_%s"%(options.ntuple);
     if not os.path.isdir(Ntuple_Dir_mm):
            pd1 = subprocess.Popen(['mkdir',Ntuple_Dir_mm]);
@@ -1317,7 +1340,7 @@ if __name__ == '__main__':
     if not os.path.isdir(Lumi_Dir_mm):
            pd2 = subprocess.Popen(['mkdir',Lumi_Dir_mm]);
            pd2.wait();
-       
+    '''    
 
 
     Cuts_File_Dir_mm="cfg/DataMCComparison_InputCfgFile";
@@ -1327,7 +1350,7 @@ if __name__ == '__main__':
        
   
     
-       
+    '''  
     ControlP_Dir_1=Lumi_Dir_mm+"/ControlPlots";
     if not os.path.isdir(ControlP_Dir_1):
            pd4 = subprocess.Popen(['mkdir',ControlP_Dir_1]);
@@ -1338,20 +1361,20 @@ if __name__ == '__main__':
     if not os.path.isdir(ControlP_Dir_2):
            pd4b = subprocess.Popen(['mkdir',ControlP_Dir_2]);
            pd4b.wait(); 
+    '''
     
-    
-    
+    '''
     Scale_W_Factor_Dir_mm=options.dir+"/WJetsSB";
     
 
-    if os.path.isdir(Scale_W_Factor_Dir_mm):
-       pd5 = subprocess.Popen(['rm','-r',Scale_W_Factor_Dir_mm]);
-       pd5.wait();
+    if not os.path.isdir(Scale_W_Factor_Dir_mm):
+       #pd5 = subprocess.Popen(['rm','-r',Scale_W_Factor_Dir_mm]);
+       #pd5.wait();
     
-    pd6 = subprocess.Popen(['mkdir',Scale_W_Factor_Dir_mm]);
-    pd6.wait();
-    
-    Control_Plots_Dir_mm=Scale_W_Factor_Dir_mm;
+       pd6 = subprocess.Popen(['mkdir',Scale_W_Factor_Dir_mm]);
+       pd6.wait();
+    '''
+    Control_Plots_Dir_mm=options.dir;
     
     
     #if not os.path.isdir(Scale_W_Factor_Dir_mm):
@@ -1480,91 +1503,93 @@ if __name__ == '__main__':
     Output_VariableList_mm.write("############################################################################\n");
     Output_VariableList_mm.write("##  Variable						Nbin		Min		Max			Label\n");
     Output_VariableList_mm.write("############################################################################\n");
-    Output_VariableList_mm.write("# l_pt							50			0		1000		pT_{l}_(GeV)\n");
     Output_VariableList_mm.write("# nPV								25			0		50			nPV\n");
-    #Output_VariableList_mm.write("l_pt							25			0		500			pT_{l}_(GeV)\n");
-    #Output_VariableList_mm.write("l_eta							25			-2.5	2.5			#eta_{l}\n");
+    Output_VariableList_mm.write("# l_pt							25			0		500			pT_{l}_(GeV)\n");
+    Output_VariableList_mm.write("# l_eta							25			-2.5	2.5			#eta_{l}\n");
     Output_VariableList_mm.write("# l_eta							20			-2.5	2.5			#eta_{l}\n");
-    #Output_VariableList_mm.write("l_phi							30			-3.14	3.14		#phi_{l}\n");
-    #Output_VariableList_mm.write("v_pt							25			200		700			pT^{W}_{l}_(GeV)\n");
-    #Output_VariableList_mm.write("v_mt								20			0		400			mT^{W}_{l}_(GeV)\n");
-    #Output_VariableList_mm.write(" pfMET							28			0		560			MET[GeV]\n");
+    Output_VariableList_mm.write("# l_phi							30			-3.14	3.14		#phi_{l}\n");
+    Output_VariableList_mm.write("# v_mt								20			0		400			mT^{W}_{l}_(GeV)\n");
+    Output_VariableList_mm.write("# pfMET							28			0		560			MET[GeV]\n");
     Output_VariableList_mm.write("# pfMETpuppi						28			0		560			MET[GeV]\n");
-    Output_VariableList_mm.write("# pfMET							50      0       1000      MET[GeV]\n");
     Output_VariableList_mm.write("# pfMETpuppi_Phi					20   -3.15      3.15	  #phi_{Puppi MET}\n");
     Output_VariableList_mm.write("# pfMET_Phi						30   -3.14      3.14	  #phi_{MET}\n");
-    #Output_VariableList_mm.write("ungroomed_jet_pt				32    100       740      pT^{AK8}_(GeV)\n");
-    Output_VariableList_mm.write("# ungroomed_jet_eta				25    -2.5      2.5        #eta^{AK8}\n");
     Output_VariableList_mm.write("# ungroomed_jet_phi				30    -3.14     3.14     #phi^{AK8}\n");
     Output_VariableList_mm.write("# ungroomed_PuppiAK8_jet_pt		32    100       740      pT^{puppi AK8}_(GeV)\n");
     Output_VariableList_mm.write("# ungroomed_PuppiAK8_jet_eta		25    -2.5      2.5        #eta^{puppi AK8}\n");
     Output_VariableList_mm.write("# ungroomed_PuppiAK8_jet_phi		30    -3.14     3.14     #phi^{puppi AK8}\n");
-    #Output_VariableList_mm.write("jet_mass_pr						15      65       105     Jet_Pruned_Mass_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# jet_mass_pr						22      40       150    Jet_Pruned_Mass_(GeV)\n");
     Output_VariableList_mm.write("# jet_mass_so						22      40       150    Jet_Softdrop_Mass_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# PuppiAK8_jet_mass_pr			22      40       150    puppiAK8_Jet_Pruned_Mass_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# PuppiAK8_jet_mass_so			22      40       150    puppiAK8_Jet_Softdrop_Mass_(GeV/c^{2})\n");
-    #Output_VariableList_mm.write("mass_lvj_type0					40    0       3000    M_{WW}_(GeV/c^{2})\n");
-    #Output_VariableList_mm.write("mass_lvj_type2					40    0       3000    M_{WW}_(GeV/c^{2})\n");
+    Output_VariableList_mm.write("# mass_lvj_type0					40    0       3000    M_{WW}_(GeV/c^{2})\n");
+    Output_VariableList_mm.write("# mass_lvj_type2					40    0       3000    M_{WW}_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# mass_lvj_type0_PuppiAK8			40    0       3000    M_{WW}_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# mass_lvj_type2_PuppiAK8			40    0       3000    M_{WW}_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# mass_lvj_type0_met				56    200       3000    M_{WW}_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# mass_lvj_type2_met				56    200       3000    M_{WW}_(GeV/c^{2})\n");
     Output_VariableList_mm.write("# nu_pz_type0						30   -500      500        pZ^{#nu}[GeV]\n");
     Output_VariableList_mm.write("# nu_pz_type2                   30   -500      500        pZ^{#nu}[GeV]\n");
-    Output_VariableList_mm.write("#nu_pz_type0_met                   60   -500      500        pZ^{#nu}[GeV]\n");
-    Output_VariableList_mm.write("#nu_pz_type2_met                   60   -500      500        pZ^{#nu}[GeV]\n");
-    Output_VariableList_mm.write("#nbjets_csvl_veto                  5      0       5        N_{bjet}^{csvl}\n");
-    Output_VariableList_mm.write("#nbjets_csvm_veto                  5      0       5        N_{bjet}^{csvm}\n");
-    Output_VariableList_mm.write("#nbjets_csvt_veto                  5      0       5        N_{bjet}^{csvt}\n");
-    Output_VariableList_mm.write("#numberJetBin                      5      0       5        N_{jets}\n");
-    #Output_VariableList_mm.write("jet_tau2tau1                     25     0.      1.       #tau_{2}/#tau_{1}\n");
+    Output_VariableList_mm.write("# nu_pz_type0_met                   60   -500      500        pZ^{#nu}[GeV]\n");
+    Output_VariableList_mm.write("# nu_pz_type2_met                   60   -500      500        pZ^{#nu}[GeV]\n");
+    Output_VariableList_mm.write("# nbjets_csvl_veto                  5      0       5        N_{bjet}^{csvl}\n");
+    Output_VariableList_mm.write("# nbjets_csvm_veto                  5      0       5        N_{bjet}^{csvm}\n");
+    Output_VariableList_mm.write("# nbjets_csvt_veto                  5      0       5        N_{bjet}^{csvt}\n");
+    Output_VariableList_mm.write("# numberJetBin                      5      0       5        N_{jets}\n");
     Output_VariableList_mm.write("# PuppiAK8_jet_tau2tau1                     25     0.      1.       puppiAK8_#tau_{2}/#tau_{1}\n");
-    #Output_VariableList_mm.write("jet2_pt				 25	0	500	 pT^{AK4}_{1}_(GeV)\n");
-    #Output_VariableList_mm.write("jet2_btag				 25	0	1	 btag^{AK4}_{1}_(GeV)\n");
-    #Output_VariableList_mm.write("jet3_pt				 25	0	500	 pT^{AK4}_{1}_(GeV)\n");
-    #Output_VariableList_mm.write("jet3_btag				 25	0	1	 btag^{AK4}_{1}_(GeV)\n");
-    Output_VariableList_mm.write("#jet_tau2tau1_exkT                30     0.1      1.      #tau_{2}/#tau_{1}_extkT\n");
-    Output_VariableList_mm.write("#jet_tau2tau1_pr                  30     0.1      1.      #tau_{2}/#tau_{1}_pruned\n");
-    Output_VariableList_mm.write("#jet_massdrop_pr                  35     0.1      1.      Pruned_Mass_Drop_(GeV/c^{2})\n");
-    Output_VariableList_mm.write("#jet_qjetvol                      35     0        1.         QjetVolatility\n");
-    Output_VariableList_mm.write("#jet_charge                       50     -2.5     2.5       Jet_Charge\n");
-    Output_VariableList_mm.write("#jet_charge_k05                       50     -2.0     2.0       Jet_Charge_k05\n");
-    Output_VariableList_mm.write("#jet_charge_k07                       50     -1.5     1.5       Jet_Charge_k07\n");
-    Output_VariableList_mm.write("#jet_charge_k10                       45     -0.8     0.8       Jet_Charge_k10\n");
-    Output_VariableList_mm.write("#jet_GeneralizedECF                   35     0.     0.6       Jet_Generalized_ECF\n");
-    Output_VariableList_mm.write("#ttb_ca8_mass_pr                   25      40      130      Jet_Pruned_Mass_(GeV/c^{2})\n");
-    Output_VariableList_mm.write("#ttb_ht                            35     0      700       \n");
-    Output_VariableList_mm.write("#ttb_ca8_ungroomed_pt              30   200      600       pT^{AK8}[GeV]\n");
-    Output_VariableList_mm.write("#ttb_ca8_tau2tau1_exkT             30    0.1      1.0      #tau_{2}/#tau_{1}_exkT\n");
-    Output_VariableList_mm.write("#ttb_ca8_tau2tau1_pr               30    0.1      1.0       #tau_{2}/#tau_{1}_pruned\n");
-    Output_VariableList_mm.write("#ttb_ca8_tau2tau1                  30    0.1      1.0       #tau_{2}/#tau_{1}\n");
-    Output_VariableList_mm.write("#ttb_ca8_charge                    50     -2.5     2.5       Jet_Charge\n");
-    Output_VariableList_mm.write("#ttb_ca8_charge_k05                50     -2.0     2.0       Jet_Charge_k05\n");
-    Output_VariableList_mm.write("#ttb_ca8_charge_k07                50     -1.5     1.5       Jet_Charge_k07\n");
-    Output_VariableList_mm.write("#ttb_ca8_charge_k10                45     -0.8     0.8       Jet_Charge_k10\n");
-    Output_VariableList_mm.write("#ttb_ca8_GeneralizedECF            30     0.     0.5       Jet_Generalized_ECF\n");
-    Output_VariableList_mm.write("#ttb_ca8_mu                        20    0.1      0.7       Pruned_Mass_Drop_(GeV/c^{2})\n");
-    Output_VariableList_mm.write("#ttb_mlvj                          40   400     1400       M_{WW}(GeV/c^{2})\n");
-    #Output_VariableList_mm.write("vbf_maxpt_j1_bDiscriminatorCSV  50      0       1          j1_bDiscriminator\n");
-    #Output_VariableList_mm.write("vbf_maxpt_j1_eta                50      -5      5          #eta_{j1}\n");
-    #Output_VariableList_mm.write("vbf_maxpt_j1_pt                 50      0       300        pT_{j1}_(GeV)\n");
-    Output_VariableList_mm.write("#vbf_maxpt_j1_QGLikelihood       50      0       1          j1_QGLikelihood\n");
-    #Output_VariableList_mm.write("vbf_maxpt_j2_bDiscriminatorCSV  50      0       1          j2_bDiscriminator\n");
-    #Output_VariableList_mm.write("vbf_maxpt_j2_eta                50      -5      5          #eta_{j2}\n");
-    #Output_VariableList_mm.write("vbf_maxpt_j2_pt                 50      0       300        pT_{j2}_(GeV)\n");
-    Output_VariableList_mm.write("#vbf_maxpt_j2_QGLikelihood       50      0       1          j2_QGLikelihood\n");
+    Output_VariableList_mm.write("# jet2_pt				 25	0	500	 pT^{AK4}_{1}_(GeV)\n");
+    Output_VariableList_mm.write("# jet2_btag				 25	0	1	 btag^{AK4}_{1}_(GeV)\n");
+    Output_VariableList_mm.write("# jet3_pt				 25	0	500	 pT^{AK4}_{1}_(GeV)\n");
+    Output_VariableList_mm.write("# jet3_btag				 25	0	1	 btag^{AK4}_{1}_(GeV)\n");
+    Output_VariableList_mm.write("# jet_tau2tau1_exkT                30     0.1      1.      #tau_{2}/#tau_{1}_extkT\n");
+    Output_VariableList_mm.write("# jet_tau2tau1_pr                  30     0.1      1.      #tau_{2}/#tau_{1}_pruned\n");
+    Output_VariableList_mm.write("# jet_massdrop_pr                  35     0.1      1.      Pruned_Mass_Drop_(GeV/c^{2})\n");
+    Output_VariableList_mm.write("# jet_qjetvol                      35     0        1.         QjetVolatility\n");
+    Output_VariableList_mm.write("# jet_charge                       50     -2.5     2.5       Jet_Charge\n");
+    Output_VariableList_mm.write("# jet_charge_k05                       50     -2.0     2.0       Jet_Charge_k05\n");
+    Output_VariableList_mm.write("# jet_charge_k07                       50     -1.5     1.5       Jet_Charge_k07\n");
+    Output_VariableList_mm.write("# jet_charge_k10                       45     -0.8     0.8       Jet_Charge_k10\n");
+    Output_VariableList_mm.write("# jet_GeneralizedECF                   35     0.     0.6       Jet_Generalized_ECF\n");
+    Output_VariableList_mm.write("# ttb_ca8_mass_pr                   25      40      130      Jet_Pruned_Mass_(GeV/c^{2})\n");
+    Output_VariableList_mm.write("# ttb_ht                            35     0      700       \n");
+    Output_VariableList_mm.write("# ttb_ca8_ungroomed_pt              30   200      600       pT^{AK8}[GeV]\n");
+    Output_VariableList_mm.write("# ttb_ca8_tau2tau1_exkT             30    0.1      1.0      #tau_{2}/#tau_{1}_exkT\n");
+    Output_VariableList_mm.write("# ttb_ca8_tau2tau1_pr               30    0.1      1.0       #tau_{2}/#tau_{1}_pruned\n");
+    Output_VariableList_mm.write("# ttb_ca8_tau2tau1                  30    0.1      1.0       #tau_{2}/#tau_{1}\n");
+    Output_VariableList_mm.write("# ttb_ca8_charge                    50     -2.5     2.5       Jet_Charge\n");
+    Output_VariableList_mm.write("# ttb_ca8_charge_k05                50     -2.0     2.0       Jet_Charge_k05\n");
+    Output_VariableList_mm.write("# ttb_ca8_charge_k07                50     -1.5     1.5       Jet_Charge_k07\n");
+    Output_VariableList_mm.write("# ttb_ca8_charge_k10                45     -0.8     0.8       Jet_Charge_k10\n");
+    Output_VariableList_mm.write("# ttb_ca8_GeneralizedECF            30     0.     0.5       Jet_Generalized_ECF\n");
+    Output_VariableList_mm.write("# ttb_ca8_mu                        20    0.1      0.7       Pruned_Mass_Drop_(GeV/c^{2})\n");
+    Output_VariableList_mm.write("# ttb_mlvj                          40   400     1400       M_{WW}(GeV/c^{2})\n");
+    Output_VariableList_mm.write("# vbf_maxpt_j1_QGLikelihood       50      0       1          j1_QGLikelihood\n");
+    Output_VariableList_mm.write("# vbf_maxpt_j2_QGLikelihood       50      0       1          j2_QGLikelihood\n");
     Output_VariableList_mm.write("abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) 35    0       9     #Delta#eta_{jj}\n");
-    #Output_VariableList_mm.write("vbf_maxpt_jj_m                  40      0       1500        M_{jj}_(GeV/c^{2})\n");
-    #Output_VariableList_mm.write("vbf_maxpt_jj_phi                50      -3.14   3.14       #phi_{jj}\n");
-    #Output_VariableList_mm.write("vbf_maxpt_jj_eta                30      -4.7       4.7     #eta_{jj}\n");
-    #Output_VariableList_mm.write("mass_ungroomedjet_closerjet      30      80     400         M_{top}^{had}\n");
-    #Output_VariableList_mm.write("mass_leptonic_closerjet          30      100     400   	    M_{top}^{lep}\n");
-    #Output_VariableList_mm.write("jet_tau2tau1                    30       0.1       1.0          #tau_{2}/#tau_{1}\n");
-    #Output_VariableList_mm.write("deltaR_lak8jet                 30        0.1       5          #DeltaR\n");
-    #Output_VariableList_mm.write("deltaphi_METak8jet             30			-3.14	3.14		#Delta#phi_{met}\n");
-    #Output_VariableList_mm.write("deltaphi_Vak8jet               30			-3.14	3.14		#Delta#phi_{Wlep}\n");
-    #Output_VariableList_mm.write("jet_mass_pr                    50         20      170         Pruned_Jet_Mass \n");
+    Output_VariableList_mm.write("# mass_ungroomedjet_closerjet      30      80     400         M_{top}^{had}\n");
+    Output_VariableList_mm.write("# mass_leptonic_closerjet          30      100     400   	    M_{top}^{lep}\n");
+    Output_VariableList_mm.write("#jet_tau2tau1                    30       0.1       1.0          #tau_{2}/#tau_{1}\n");
+    '''
+    Output_VariableList_mm.write("deltaR_lak8jet                 50        0.1       5          #DeltaR\n");
+    Output_VariableList_mm.write("deltaphi_METak8jet             50			-3.14	3.14		#Delta#phi_{met}\n");
+    Output_VariableList_mm.write("deltaphi_Vak8jet               50			-3.14	3.14		#Delta#phi_{Wlep}\n");
+    Output_VariableList_mm.write("vbf_maxpt_jj_m                  40      0       1500        M_{jj}_(GeV/c^{2})\n");
+    Output_VariableList_mm.write("#vbf_maxpt_jj_phi                50      -3.14   3.14       #phi_{jj}\n");
+    Output_VariableList_mm.write("vbf_maxpt_jj_eta                30      -4.7       4.7     #eta_{jj}\n");
+    Output_VariableList_mm.write("vbf_maxpt_j2_bDiscriminatorCSV  50      0       1          j2_bDiscriminator\n");
+    Output_VariableList_mm.write("vbf_maxpt_j2_eta                50      -5      5          #eta_{j2}\n");
+    Output_VariableList_mm.write("vbf_maxpt_j2_pt                 50      0       300        pT_{j2}_(GeV)\n");
+    Output_VariableList_mm.write("vbf_maxpt_j1_bDiscriminatorCSV  50      0       1          j1_bDiscriminator\n");
+    Output_VariableList_mm.write("vbf_maxpt_j1_eta                50      -5      5          #eta_{j1}\n");
+    Output_VariableList_mm.write("vbf_maxpt_j1_pt                 50      0       300        pT_{j1}_(GeV)\n");
+    Output_VariableList_mm.write("jet_tau2tau1                     25     0.      1.       #tau_{2}/#tau_{1}\n");
+    Output_VariableList_mm.write("jet_mass_pr						15      65       105     Jet_Pruned_Mass_(GeV/c^{2})\n");
+    Output_VariableList_mm.write("ungroomed_jet_pt				32    100       740      pT^{AK8}_(GeV)\n");
+    Output_VariableList_mm.write("ungroomed_jet_eta				25    -2.5      2.5        #eta^{AK8}\n");
+    Output_VariableList_mm.write("pfMET							50      0       1000      MET[GeV]\n");
+    Output_VariableList_mm.write("v_pt							25			200		700			pT^{W}_{l}_(GeV)\n");
+    Output_VariableList_mm.write("l_pt							50			0		1000		pT_{l}_(GeV)\n");
+    '''    
+    
     Output_VariableList_mm.close();
     # Make InputFile and SampleListFile
     Ntuple_mm=options.ntuple;       
@@ -2207,7 +2232,7 @@ if __name__ == '__main__':
         
 
         
-        efficence_result_string=["RISULTATI SCALE FACTOR WJETS",
+        efficence_result_string=["RISULTATI SCALE FACTOR W+JETS (Evaluated in WJets SideBand)",
                           " ",
                           " ",
                           "Sample: %s"%sampleValue[nsample][0],
@@ -2244,7 +2269,15 @@ if __name__ == '__main__':
         OutputWJetsFile.write("\n%f"%Scale_W_control_factor); 			# 4 WJets ScaleFactor
 
         OutputWJetsFile.write("\n%f"%Sigma_W_control_ScaleFactor); 		# 5 Sigma WJets ScaleFactor
+
+        OutputWJetsFile.write("\n%f"%B_Tagging_Correction_Factor);		# 6 B-Tagging Correction Factor
+
+        OutputWJetsFile.write("\n%f"%Sigma_B_Tagging_Correction_Factor);# 7 Sigma B-Tagging Correction Factor
         
+        OutputWJetsFile.write("\n%f"%Scale_T_Factor_global);			# 8 Scale TTB factor for W+Jets
+        
+        OutputWJetsFile.write("\n%f"%Sigma_Scale_T_Factor_global);		# 9 Sigma Scale TTB factor for W+Jets
+
         OutputWJetsFile.close();
        
         
