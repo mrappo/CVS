@@ -29,13 +29,13 @@ lumi_str=str("%.0f"%options.lumi);
 ########################################################
 if __name__ == '__main__':
     
-    Ntuple_Dir_mm="output/Ntuple_%s"%(ntuple);
+    Ntuple_Dir_mm="output/Ntuple_%s"%(options.ntuple);
     if not os.path.isdir(Ntuple_Dir_mm):
            pd1 = subprocess.Popen(['mkdir',Ntuple_Dir_mm]);
            pd1.wait();
 
 
-    Lumi_Dir_mm=Ntuple_Dir_mm+"/Lumi_%.0f"%(lumi);
+    Lumi_Dir_mm=Ntuple_Dir_mm+"/Lumi_%.0f"%(options.lumi);
     if not os.path.isdir(Lumi_Dir_mm):
            pd2 = subprocess.Popen(['mkdir',Lumi_Dir_mm]);
            pd2.wait();
@@ -57,7 +57,7 @@ if __name__ == '__main__':
     
     
     
-    ControlP_Dir_2=ControlP_Dir_1+"/%s_Channel"%channel;
+    ControlP_Dir_2=ControlP_Dir_1+"/%s_Channel"%options.channel;
     if not os.path.isdir(ControlP_Dir_2):
            pd4b = subprocess.Popen(['mkdir',ControlP_Dir_2]);
            pd4b.wait();
@@ -65,10 +65,13 @@ if __name__ == '__main__':
     
        
     ## DeltaEta Cut
+    #DEta_values=[0.0,1.0,1.5,2.0];
     DEta_values=[0.0,1.0,1.5,2.0,2.5,3.0,3.5,4.0];
+    #DEta_values=[0.0,1.0];
     
     # Mjj Cut
     DMjj_values=[0.0,100.0,150.0,200.0,250.0,300.0,350.0,400.0];
+    #DMjj_values=[0.0,100,200,300];
     
        
     n_eta=0;
@@ -101,14 +104,14 @@ if __name__ == '__main__':
        range_value=int((n_mjj*n_eta));
        print range_value
        VBF_cut_values=[0.0 for i in range(range_value)];
-          
+       print "\n"
        i=j=0;
        if (n_eta<n_mjj):
           for i in range(n_eta):
               for j in range(n_mjj):
                   i=int(i);
                   j=int(j);
-                  tmp=int(i*(n_eta+1)+j);
+                  tmp=int(i*(n_mjj)+j);
                   #print VBF_cut_values[tmp]
                   #print tmp
                   VBF_cut_values[tmp]=[float("%1.3f"%DEta_values[i]),float("%.1f"%DMjj_values[j])];
@@ -119,7 +122,7 @@ if __name__ == '__main__':
               for j in range(n_eta):
                   i=int(i);
                   j=int(j);
-                  tmp=int(i*(n_mjj+1)+j);
+                  tmp=int(i*(n_eta)+j);
                   #print VBF_cut_values[tmp]
                   #print "tmp: %.0f\ti: %.0f\tj: %.0f"%(tmp,i,j) 
                   VBF_cut_values[tmp]=[float("%1.3f"%DEta_values[j]),float("%.1f"%DMjj_values[i])];
@@ -164,6 +167,8 @@ if __name__ == '__main__':
     print "\n"
     for i in range(range_value):
         i=int(i);
+        #print i
+        #print VBF_cut_values[i]
         tmp=VBF_cut_values[i];
         DEta_tmp=tmp[0];
         Mjj_tmp=tmp[1];
@@ -180,14 +185,15 @@ if __name__ == '__main__':
         DEta_local=float("%1.3f"%tmp[0]);
         Mjj_local=float("%.1f"%tmp[1]);
         
-        if not (DEta_local and Mjj_local):
+        if (DEta_local==0.0 and Mjj_local==0.0):
            nJetsCut_value=0.0;
         else:
            nJetsCut_value=1.0;
         
         ControlP_Dir_3=ControlP_Dir_2+"/Deta%1.3f_Mjj%.0f_NJ%.0f"%(DEta_local,Mjj_local,nJetsCut_value);
+        print ControlP_Dir_3
         if os.path.isdir(ControlP_Dir_3):
-           pd5 = subprocess.Popen(['rm','-r',ControlP_Dir_2]);
+           pd5 = subprocess.Popen(['rm','-r',ControlP_Dir_3]);
            pd5.wait();
     
         pd6 = subprocess.Popen(['mkdir',ControlP_Dir_3]);
@@ -218,7 +224,7 @@ if __name__ == '__main__':
            
 
            
-           cmd_tmp = "python MATTEO_run_all_ControlPlots.py --DEtaCut %f --MjjCut %f --nJetsCut %f --dir %s"%(DEta_local,Mjj_local,nJetsCut_value,ControlP_Dir_3);
+           cmd_tmp = "python run_all_ControlPlots.py --DEtaCut %f --MjjCut %f --nJetsCut %f --dir %s"%(DEta_local,Mjj_local,nJetsCut_value,ControlP_Dir_3);
            cmd=cmd_tmp+" > "+log_file;
            outScript.write("\n"+cmd);
            #outScript.write("\n"+'rm *.out');
@@ -230,8 +236,8 @@ if __name__ == '__main__':
 
         else:
            DEta_local_str=str(DEta_local);
-           Mjj_local=str(Mjj_local);
-           nJetsCut_value=str(nJetsCut_value);
+           Mjj_local_str=str(Mjj_local);
+           nJetsCut_value_str=str(nJetsCut_value);
               
-           pMCP = subprocess.Popen(['python','MATTEO_run_all_ControlPlots.py','--DEtaCut',DEta_local_str,'--MjjCut',Mjj_local_str,'--nJetsCut',nJetsCut_value_str,'--dir',ControlP_Dir_3]);
+           pMCP = subprocess.Popen(['python','run_all_ControlPlots.py','--DEtaCut',DEta_local_str,'--MjjCut',Mjj_local_str,'--nJetsCut',nJetsCut_value_str,'--dir',ControlP_Dir_3]);
            pMCP.wait();

@@ -1279,17 +1279,7 @@ if __name__ == '__main__':
     #########################################################
     ######### SET INITIAL VALUE
     #########################################################    
-    
-    '''
-    for i in range(2):
-        for k in range(5):
-        
-            if i:
-               print "\nVBF_Sample: %s \tReducedName: %s \tMass: %.0f \txSec: %f \tNumbEntBefore: %.0f \tScaleFactor: %.0f\n"%(total_sample_value[i][k][0],total_sample_value[i][k][1],total_sample_value[i][k][2],total_sample_value[i][k][3],total_sample_value[i][k][4],total_sample_value[i][k][5])
-            else:
-               print "\nNormal_Sample: %s \tReducedName: %s \tMass: %.0f \txSec: %f \tNumbEntBefore: %.0f \tScaleFactor: %.0f\n"%(total_sample_value[i][k][0],total_sample_value[i][k][1],total_sample_value[i][k][2],total_sample_value[i][k][3],total_sample_value[i][k][4],total_sample_value[i][k][5])
-    '''
-    
+
     InFile=options.inData;
     InputValueVector=GetDataFromFile(InFile);
     
@@ -1329,18 +1319,6 @@ if __name__ == '__main__':
     ######### MAKING DIRECTORY
     #########################################################
     print "\n\n\n----------- Check or making directory ---------------------\n"
-    '''
-    Ntuple_Dir_mm="output/Ntuple_%s"%(options.ntuple);
-    if not os.path.isdir(Ntuple_Dir_mm):
-           pd1 = subprocess.Popen(['mkdir',Ntuple_Dir_mm]);
-           pd1.wait();
-
-
-    Lumi_Dir_mm=Ntuple_Dir_mm+"/Lumi_%s"%(Lumi_mm_str);
-    if not os.path.isdir(Lumi_Dir_mm):
-           pd2 = subprocess.Popen(['mkdir',Lumi_Dir_mm]);
-           pd2.wait();
-    '''    
 
 
     Cuts_File_Dir_mm="cfg/DataMCComparison_InputCfgFile";
@@ -1348,42 +1326,9 @@ if __name__ == '__main__':
            pd3 = subprocess.Popen(['mkdir',Cuts_File_Dir_mm]);
            pd3.wait();
        
-  
-    
-    '''  
-    ControlP_Dir_1=Lumi_Dir_mm+"/ControlPlots";
-    if not os.path.isdir(ControlP_Dir_1):
-           pd4 = subprocess.Popen(['mkdir',ControlP_Dir_1]);
-           pd4.wait();  
-    
-    
-    ControlP_Dir_2=ControlP_Dir_1+"/%s_Channel"%Channel_global;
-    if not os.path.isdir(ControlP_Dir_2):
-           pd4b = subprocess.Popen(['mkdir',ControlP_Dir_2]);
-           pd4b.wait(); 
-    '''
-    
-    '''
-    Scale_W_Factor_Dir_mm=options.dir+"/WJetsSB";
-    
 
-    if not os.path.isdir(Scale_W_Factor_Dir_mm):
-       #pd5 = subprocess.Popen(['rm','-r',Scale_W_Factor_Dir_mm]);
-       #pd5.wait();
-    
-       pd6 = subprocess.Popen(['mkdir',Scale_W_Factor_Dir_mm]);
-       pd6.wait();
-    '''
     Control_Plots_Dir_mm=options.dir;
-    
-    
-    #if not os.path.isdir(Scale_W_Factor_Dir_mm):
-    #
-    
-    #cfg_file_removal=Cuts_File_Dir_mm+"/MATTEO_*";
-    #pd7 = subprocess.Popen(['rm','-r',cfg_file_removal]);
-    #pd7.wait();
-    
+
     
 
 
@@ -1466,12 +1411,12 @@ if __name__ == '__main__':
         cuts_table_main[0][cut_counter]=cut_string1;
         cuts_table_main[1][cut_counter]=cut_string2;
         
-        cuts_file1=Cuts_File_Dir_mm+"/MATTEO_cuts_file1_%s.txt"%(str(Plus_Cut_Counter));
+        cuts_file1=Cuts_File_Dir_mm+"/MATTEO_WJets_cuts_file1_%s_%s_%s_%s.txt"%(str(Plus_Cut_Counter),DEtaCut_value,MjjCut_value,nJetsCut_value);
         output_cuts_file1=open(cuts_file1,'w+');
         output_cuts_file1.write(cut_string1);
         output_cuts_file1.close();
 
-        cuts_file2=Cuts_File_Dir_mm+"/MATTEO_cuts_file2_%s.txt"%(str(Plus_Cut_Counter));
+        cuts_file2=Cuts_File_Dir_mm+"/MATTEO_WJets_cuts_file2_%s_%s_%s_%s.txt"%(str(Plus_Cut_Counter),DEtaCut_value,MjjCut_value,nJetsCut_value);
         output_cuts_file2=open(cuts_file2,'w+');
         output_cuts_file2.write(cut_string2);
         output_cuts_file2.close();
@@ -1498,7 +1443,7 @@ if __name__ == '__main__':
     
     
     # Make VariableList
-    FileName_VariableList_mm="cfg/DataMCComparison_InputCfgFile/MATTEO_VariableList_76x.txt";
+    FileName_VariableList_mm="cfg/DataMCComparison_InputCfgFile/MATTEO_VariableList_WJets_%s_%s_%s.txt"%(DEtaCut_value,MjjCut_value,nJetsCut_value);
     Output_VariableList_mm=open(FileName_VariableList_mm,'w+');
     Output_VariableList_mm.write("############################################################################\n");
     Output_VariableList_mm.write("##  Variable						Nbin		Min		Max			Label\n");
@@ -1611,7 +1556,7 @@ if __name__ == '__main__':
         Mass_mm=sampleValue[Sample_Counter_mm][2];
         Mass_str_mm=str("%.0f"%Mass_mm);
             
-        FileName_Sample_mm="cfg/DataMCComparison_InputCfgFile/MATTEO_SampleList_76x_%s_%s%s.txt"%(Ntuple_mm,Sample_mm,Mass_str_mm);
+        FileName_Sample_mm="cfg/DataMCComparison_InputCfgFile/MATTEO_SampleList_%s%s_WJets_%s_%s_%s_%s.txt"%(Sample_mm,Mass_str_mm,options.channel,DEtaCut_value,MjjCut_value,nJetsCut_value);
     
     
         Output_SampleFile_mm=open(FileName_Sample_mm,'w+');
@@ -1719,9 +1664,10 @@ if __name__ == '__main__':
                LetterName_mm="G";
             else:
                LetterName_mm="H";
-            Dir_Data_Saved_mm="output/run2/MCDATAComparisonPlot_TTBarCR_%s_%s_%s%s_%s_%s"%(Channel_global,Ntuple_mm,Sample_mm,Mass_mm,Cut_Type_String_mm,Cut_Number_String_mm);
+            Dir_Data_Saved_mm="output/run2/MCDATAComparisonPlot_WJets_%s_%s%s_%s_%s_%s_%s_%s"%(Channel_global,Sample_mm,Mass_mm,Cut_Type_String_mm,Cut_Number_String_mm,DEtaCut_value,MjjCut_value,nJetsCut_value);
+            
        
-            Cfg_Input_FileName_mm="cfg/DataMCComparison_InputCfgFile/MATTEO_DataMCComparison_InputCfgFile_%s%s_TTBarCR_%s_%s_%s.cfg"%(Sample_mm,Mass_str_mm,options.channel,Cut_Type_String_mm,Cut_Number_String_mm)
+            Cfg_Input_FileName_mm="cfg/DataMCComparison_InputCfgFile/MATTEO_DataMCComparison_InputCfgFile_%s%s_WJets_%s_%s_%s_%s_%s_%s.cfg"%(Sample_mm,Mass_str_mm,options.channel,Cut_Type_String_mm,Cut_Number_String_mm,DEtaCut_value,MjjCut_value,nJetsCut_value);
             Output_SampleFile_mm_sample=open(Cfg_Input_FileName_mm,'w+');
             Output_SampleFile_mm_sample.write("[Input]\n\n");
             Output_SampleFile_mm_sample.write(("InputDirectory = /afs/cern.ch/user/l/lbrianza/work/public/%s/WWTree_%s\n")%(Ntuple_mm,Channel_global));

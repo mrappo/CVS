@@ -1489,12 +1489,12 @@ if __name__ == '__main__':
         cuts_table_main[0][cut_counter]=cut_string1;
         cuts_table_main[1][cut_counter]=cut_string2;
         
-        cuts_file1=Cuts_File_Dir_mm+"/MATTEO_cuts_file1_%s.txt"%(str(Plus_Cut_Counter));
+        cuts_file1=Cuts_File_Dir_mm+"/MATTEO_SR_cuts_file1_%s_%s_%s_%s.txt"%(str(Plus_Cut_Counter),DEtaCut_value,MjjCut_value,nJetsCut_value);
         output_cuts_file1=open(cuts_file1,'w+');
         output_cuts_file1.write(cut_string1);
         output_cuts_file1.close();
 
-        cuts_file2=Cuts_File_Dir_mm+"/MATTEO_cuts_file2_%s.txt"%(str(Plus_Cut_Counter));
+        cuts_file2=Cuts_File_Dir_mm+"/MATTEO_SR_cuts_file2_%s_%s_%s_%s.txt"%(str(Plus_Cut_Counter),DEtaCut_value,MjjCut_value,nJetsCut_value);
         output_cuts_file2=open(cuts_file2,'w+');
         output_cuts_file2.write(cut_string2);
         output_cuts_file2.close();
@@ -1521,7 +1521,7 @@ if __name__ == '__main__':
     
     
     # Make VariableList
-    FileName_VariableList_mm="cfg/DataMCComparison_InputCfgFile/MATTEO_VariableList_76x.txt";
+    FileName_VariableList_mm="cfg/DataMCComparison_InputCfgFile/MATTEO_VariableList_SR_%s_%s_%s.txt"%(DEtaCut_value,MjjCut_value,nJetsCut_value);
     Output_VariableList_mm=open(FileName_VariableList_mm,'w+');
     Output_VariableList_mm.write("############################################################################\n");
     Output_VariableList_mm.write("##  Variable						Nbin		Min		Max			Label\n");
@@ -1633,7 +1633,7 @@ if __name__ == '__main__':
         Mass_mm=sampleValue[Sample_Counter_mm][2];
         Mass_str_mm=str("%.0f"%Mass_mm);
             
-        FileName_Sample_mm="cfg/DataMCComparison_InputCfgFile/MATTEO_SampleList_76x_%s_%s%s.txt"%(Ntuple_mm,Sample_mm,Mass_str_mm);
+        FileName_Sample_mm="cfg/DataMCComparison_InputCfgFile/MATTEO_SampleList_%s%s_SR_%s_%s_%s_%s.txt"%(Sample_mm,Mass_str_mm,options.channel,DEtaCut_value,MjjCut_value,nJetsCut_value);
     
     
         Output_SampleFile_mm=open(FileName_Sample_mm,'w+');
@@ -1741,9 +1741,9 @@ if __name__ == '__main__':
                LetterName_mm="G";
             else:
                LetterName_mm="H";
-            Dir_Data_Saved_mm="output/run2/MCDATAComparisonPlot_TTBarCR_%s_%s_%s%s_%s_%s"%(Channel_global,Ntuple_mm,Sample_mm,Mass_mm,Cut_Type_String_mm,Cut_Number_String_mm);
+            Dir_Data_Saved_mm="output/run2/MCDATAComparisonPlot_SR_%s_%s%s_%s_%s_%s_%s_%s"%(Channel_global,Sample_mm,Mass_mm,Cut_Type_String_mm,Cut_Number_String_mm,DEtaCut_value,MjjCut_value,nJetsCut_value);
        
-            Cfg_Input_FileName_mm="cfg/DataMCComparison_InputCfgFile/MATTEO_DataMCComparison_InputCfgFile_%s%s_TTBarCR_%s_%s_%s.cfg"%(Sample_mm,Mass_str_mm,options.channel,Cut_Type_String_mm,Cut_Number_String_mm)
+            Cfg_Input_FileName_mm="cfg/DataMCComparison_InputCfgFile/MATTEO_DataMCComparison_InputCfgFile_%s%s_SR_%s_%s_%s_%s_%s_%s.cfg"%(Sample_mm,Mass_str_mm,options.channel,Cut_Type_String_mm,Cut_Number_String_mm,DEtaCut_value,MjjCut_value,nJetsCut_value);
             Output_SampleFile_mm_sample=open(Cfg_Input_FileName_mm,'w+');
             Output_SampleFile_mm_sample.write("[Input]\n\n");
             Output_SampleFile_mm_sample.write(("InputDirectory = /afs/cern.ch/user/l/lbrianza/work/public/%s/WWTree_%s\n")%(Ntuple_mm,Channel_global));
