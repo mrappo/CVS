@@ -316,7 +316,12 @@ def print_boxed_string_File(in_string_vector,out_file):
 
 
 
-
+def GetDataFromFile(filename):
+    
+    f = open(filename,'r');
+    lines=f.readlines();
+    
+    return lines;
 
 
 
@@ -392,7 +397,7 @@ if __name__ == '__main__':
            pd9.wait();
     
     # W+Jets SideBand Directory       
-    ControlP_Dir_WJ=ControlP_Dir_2+"/WJets_SideBand";
+    ControlP_Dir_WJ=ControlP_Dir_2+"/WJetsSB";
     if not os.path.isdir(ControlP_Dir_WJ):
            pd10 = subprocess.Popen(['mkdir',ControlP_Dir_WJ]);
            pd10.wait();
@@ -446,12 +451,13 @@ if __name__ == '__main__':
     #########################################################
     ######### MAKE EFFICIENCY TTBAR FILE
     #########################################################
-        
+    '''    
     E12 = subprocess.Popen(['python','MATTEO_TTB_epsilon.py','--sampleUsed',sampleUsed,'--channel',channel,'--ntuple',ntuple,'--sumFile',summaryF,'--dir',ControlP_Dir_2]); 
     E12.wait();
 
-    E21 = subprocess.Popen(['python','MATTEO_TTB_epsilon.py','--inverse','--sampleUsed',sampleUsed,'--channel',channel,'--ntuple',ntuple'--sumFile',summaryF,'--dir',ControlP_Dir_2]);
+    E21 = subprocess.Popen(['python','MATTEO_TTB_epsilon.py','--inverse','--sampleUsed',sampleUsed,'--channel',channel,'--ntuple',ntuple,'--sumFile',summaryF,'--dir',ControlP_Dir_2]);
     E21.wait();
+    '''
     # Save in the Output_Efficiency_File_mm -> /TTBarCR_12/ScaleW1.21ScaleT1.0/Efficiency.txt
     # 0 SAMPLE
     # 1 MASS
@@ -466,16 +472,30 @@ if __name__ == '__main__':
     # 10 K-FACTOR
     # 11 SIGMA_K_FACTOR
     # 12 SF TTBAR
-    # 13  SIGMA_SF_TTBAR
+    # 13 SIGMA_SF_TTBAR
  
+    TTBEfficiency12FileName=ControlP_Dir_T12+"/Efficiency.txt";
+    TTB_Efficiency12_DataFileVector=GetDataFromFile(TTBEfficiency12FileName);
 
-
-
+    TTBEfficiency21FileName=ControlP_Dir_T21+"/Efficiency.txt";
+    TTB_Efficiency21_DataFileVector=GetDataFromFile(TTBEfficiency21FileName);
+    
+    b12_epsilon_data=float(TTB_Efficiency12_DataFileVector[8]);
+    b12_epsilon_mc=float(TTB_Efficiency12_DataFileVector[6]);
+    Sigma_b12_epsilon_data=float(TTB_Efficiency12_DataFileVector[9]);
+    Sigma_b12_epsilon_mc=float(TTB_Efficiency12_DataFileVector[7]);    
+    
+    b21_epsilon_data=float(TTB_Efficiency21_DataFileVector[8]);
+    b21_epsilon_mc=float(TTB_Efficiency21_DataFileVector[6]);
+    Sigma_b21_epsilon_data=float(TTB_Efficiency21_DataFileVector[9]);
+    Sigma_b21_epsilon_mc=float(TTB_Efficiency21_DataFileVector[7]);
+    
+    
     #########################################################
     ######### GET THE CORRECT TTBAR SCALE FACTOR
     #########################################################
 
-    SFTTB = subprocess.Popen(['python','MATTEO_TTB_SF.py','--inverse','--sampleUsed',sampleUsed,'--channel',channel,'--ntuple',ntuple'--sumFile',summaryF'--dir',ControlP_Dir_2]);
+    SFTTB = subprocess.Popen(['python','MATTEO_TTB_SF.py','--sampleUsed',sampleUsed,'--channel',channel,'--ntuple',ntuple,'--sumFile',summaryF,'--dir',ControlP_Dir_2]);
     SFTTB.wait();
 
     # Save in the Output_ScaleFactorTrue_File_mm -> /TTBarCR/ScaleFactorTrue.txt
@@ -486,8 +506,82 @@ if __name__ == '__main__':
     # 4 True TTBar ScaleFactor
     # 5 Sigma True TTBar ScaleFactor
 
+    TTBScaleFactorFileName=ControlP_Dir_TTB+"/ScaleFactorTrue.txt";
+    
+    TTB_TrueSF_DataFileVector=GetDataFromFile(TTBScaleFactorFileName);
+    
+    TTB_True_ScaleFactor=float(TTB_TrueSF_DataFileVector[4]);
+    Sigma_TTB_True_ScaleFactor=float(TTB_TrueSF_DataFileVector[5]);
+    
+    
+    
+    
+    
+    #########################################################
+    ######### GET THE WJets SCALE FACTOR
+    #########################################################
+    InputWJetsFileName=ControlP_Dir_WJ+"/WJ_input.txt";
+    InputWJetsFile=open(InputWJetsFileName,'w+');
+    #InputWJetsFile.write("%f\n"%);
+    InputWJetsFile.write("%f\n"%b12_epsilon_data);
+    InputWJetsFile.write("%f\n"%b21_epsilon_data);
+    InputWJetsFile.write("%f\n"%b12_epsilon_mc);
+    InputWJetsFile.write("%f\n"%b21_epsilon_mc);
+    
+    InputWJetsFile.write("%f\n"%Sigma_b12_epsilon_data);
+    InputWJetsFile.write("%f\n"%Sigma_b21_epsilon_data);
+    InputWJetsFile.write("%f\n"%Sigma_b12_epsilon_mc);
+    InputWJetsFile.write("%f\n"%Sigma_b21_epsilon_mc);    
+    
+    InputWJetsFile.write("%f\n"%TTB_True_ScaleFactor);
+    InputWJetsFile.write("%f\n"%Sigma_TTB_True_ScaleFactor);
+    
+    InputWJetsFile.close();
+    
+    SFWJ = subprocess.Popen(['python','MATTEO_WJets_SF.py','--sampleUsed',sampleUsed,'--channel',channel,'--ntuple',ntuple,'--sumFile',summaryF,'--dir',ControlP_Dir_2,'--inData',InputWJetsFileName]);
+    SFWJ.wait();
 
 
-
-
+    # Save the output in -> /WJetsSB/WJets_SideBand_output.txt
+    # 0 SAMPLE
+    # 1 MASS
+    # 2 N_mc
+    # 3 N_data
+    # 4 WJets ScaleFactor
+    # 5 Sigma WJets ScaleFactor
+    
+    WJScaleFactorFileName=ControlP_Dir_WJ+"/WJets_SideBand_output.txt";
+    
+    WJ_SF_DataFileVector=GetDataFromFile(WJScaleFactorFileName);
+    
+    WJ_ScaleFactor=float(WJ_SF_DataFileVector[4]);
+    Sigma_WJ_ScaleFactor=float(WJ_SF_DataFileVector[5]);
+    
+    #########################################################
+    ######### MAKE CONTROL PLOTS
+    #########################################################
+    
+    InputControlPlotsFileName=ControlP_Dir_SR+"/SR_input.txt";
+    InputControlPlotsFile=open(InputControlPlotsFileName,'w');
+    
+    InputControlPlotsFile.write("%f\n"%b12_epsilon_data);
+    InputControlPlotsFile.write("%f\n"%b21_epsilon_data);
+    InputControlPlotsFile.write("%f\n"%b12_epsilon_mc);
+    InputControlPlotsFile.write("%f\n"%b21_epsilon_mc);
+    
+    InputControlPlotsFile.write("%f\n"%Sigma_b12_epsilon_data);
+    InputControlPlotsFile.write("%f\n"%Sigma_b21_epsilon_data);
+    InputControlPlotsFile.write("%f\n"%Sigma_b12_epsilon_mc);
+    InputControlPlotsFile.write("%f\n"%Sigma_b21_epsilon_mc);    
+    
+    InputControlPlotsFile.write("%f\n"%TTB_True_ScaleFactor);
+    InputControlPlotsFile.write("%f\n"%Sigma_TTB_True_ScaleFactor);
+       
+    InputControlPlotsFile.write("\n%f"%WJ_ScaleFactor);
+    InputControlPlotsFile.write("\n%f"%Sigma_WJ_ScaleFactor);
+    
+    InputControlPlotsFile.close();
+    
+    SRCP = subprocess.Popen(['python','MATTEO_SignalRegion_CP.py','--sampleUsed',sampleUsed,'--channel',channel,'--ntuple',ntuple,'--sumFile',summaryF,'--dir',ControlP_Dir_2,'--inData',InputControlPlotsFileName]);
+    SRCP.wait();
 

@@ -1396,7 +1396,7 @@ if __name__ == '__main__':
     
     
     
-    Scale_W_Factor_Dir_mm=ControlP_Dir_3+"/ScaleW%s_ScaleT%s"%(Scale_W_Factor_global_str,Scale_T_Factor_global);
+    Scale_W_Factor_Dir_mm=ControlP_Dir_3;#+"/ScaleW%s_ScaleT%s"%(Scale_W_Factor_global_str,Scale_T_Factor_global);
     
 
     if os.path.isdir(Scale_W_Factor_Dir_mm):
@@ -1412,9 +1412,9 @@ if __name__ == '__main__':
     #if not os.path.isdir(Scale_W_Factor_Dir_mm):
     #
     
-    cfg_file_removal=Cuts_File_Dir_mm+"/MATTEO_*";
-    pd7 = subprocess.Popen(['rm','-r',cfg_file_removal]);
-    pd7.wait();
+    #cfg_file_removal=Cuts_File_Dir_mm+"/MATTEO_*";
+    #pd7 = subprocess.Popen(['rm','-r',cfg_file_removal]);
+    #pd7.wait();
     
     
     #########################################################
