@@ -273,9 +273,13 @@ if (options.channel=="el" or options.channel=="em"):
 else:
     
     frameSubTitle_AD_string="\hspace{6pt} W+Jets SideBand";
-    cuts_itemize=["deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>40 && pfMET>40 && jet_tau2tau1 < 0.6 && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>0.0001  && nBTagJet_medium==0 && vbf_maxpt_j1_bDiscriminatorCSV<0.89 && vbf_maxpt_j2_bDiscriminatorCSV<0.89 && ((jet_mass_pr > 40 && jet_mass_pr < 65 )  || ( jet_mass_pr > 135 && jet_mass_pr < 150))"]; 
 
-    
+    tmp_cut="deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>40 && pfMET>40 && jet_tau2tau1 < 0.6 && ((jet_mass_pr > 40 && jet_mass_pr < 65 )  || ( jet_mass_pr > 135 && jet_mass_pr < 150))"; 
+       
+    add_cut_tmp=" && njets>%s && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>%s && vbf_maxpt_jj_m >%s"%(nJetsCut_value,DEtaCut_value,MjjCut_value);
+       
+    total_tmp_cut=tmp_cut+add_cut_tmp+"&& nBTagJet_medium==0 && vbf_maxpt_j1_bDiscriminatorCSV<0.89 && vbf_maxpt_j2_bDiscriminatorCSV<0.89 ";
+    cuts_itemize=[total_tmp_cut];    
 
 
 
@@ -725,7 +729,7 @@ if __name__ == '__main__':
             Output_SampleFile_mm_sample.close();
             
             tmp_string=["MAKING Cfg File",
-                        "Made CFG File:\t%s"%Cfg_Input_FileName_mm];
+                        "%s"%Cfg_Input_FileName_mm];
             print_boxed_string_File(tmp_string,summaryF_mm);
             Cfg_FileName_Table_mm[CutType_mm][Cut_Number_mm][Sample_Counter_mm]=Cfg_Input_FileName_mm;
             Cfg_FileName_Table_mm[CutType_mm][Cut_Number_mm][Sample_Total_Number_mm+Sample_Counter_mm]=Dir_Data_Saved_mm+"/";
@@ -872,9 +876,6 @@ if __name__ == '__main__':
             
           
             print_lined_string_File(resume_processing_string,summaryF_mm);
-            
-            # TTBar ScaleFactor for ControlPlot code
-            TTBar_Scale_Factor=1.0;
             
             
             if (Cuts_Total_Number_mm-1):
@@ -1059,7 +1060,7 @@ if __name__ == '__main__':
         N_ReadedData=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][number_Events_type+2];
         N_Signal_gg=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][9];
         N_Signal_VBF=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][10];
-        N_data=N_ReadedData-N_TTBar_mc-N_VV_mc-N_Signal_VBF-N_Signal_gg;
+        N_data=N_ReadedData-N_TTBar_mc-N_VV_mc-N_Signal_VBF-N_Signal_gg-N_STop_mc;
         N_mc=N_WJets_mc;
         
         Scale_W_control_factor=N_data/N_mc;

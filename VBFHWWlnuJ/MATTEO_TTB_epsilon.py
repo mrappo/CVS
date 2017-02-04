@@ -350,10 +350,24 @@ if (options.channel=="el" or options.channel=="em"):
 else:
  
     frameSubTitle_AD_string="\hspace{6pt} TTBarCR";
+      
     if options.inverse:
-       cuts_itemize=["deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>40 && pfMET>40 && jet_tau2tau1 < 0.6 && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>0.0001 && (jet_mass_pr > 65 && jet_mass_pr < 105 )","vbf_maxpt_j2_bDiscriminatorCSV>0.89","vbf_maxpt_j1_bDiscriminatorCSV>0.89"]; 
+       tmp_cut="deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>40 && pfMET>40 && jet_tau2tau1 < 0.6  && (jet_mass_pr > 65 && jet_mass_pr < 105 )" ;
+       
+       add_cut_tmp=" && njets> %s && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) > %s && vbf_maxpt_jj_m > %s"%(nJetsCut_value,DEtaCut_value,MjjCut_value);
+       
+       total_tmp_cut=tmp_cut+add_cut_tmp;
+
+       cuts_itemize=[total_tmp_cut,"vbf_maxpt_j2_bDiscriminatorCSV>0.89","vbf_maxpt_j1_bDiscriminatorCSV>0.89"]; 
+       
     else:
-       cuts_itemize=["deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>40 && pfMET>40 && jet_tau2tau1 < 0.6 && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>0.0001 && (jet_mass_pr > 65 && jet_mass_pr < 105 )","vbf_maxpt_j1_bDiscriminatorCSV>0.89","vbf_maxpt_j2_bDiscriminatorCSV>0.89"]; 
+       tmp_cut="deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>40 && pfMET>40 && jet_tau2tau1 < 0.6 && (jet_mass_pr > 65 && jet_mass_pr < 105 ) "; 
+       
+       add_cut_tmp=" && njets>%s && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>%s && vbf_maxpt_jj_m >%s"%(nJetsCut_value,DEtaCut_value,MjjCut_value);
+       
+       total_tmp_cut=tmp_cut+add_cut_tmp;
+
+       cuts_itemize=[total_tmp_cut,"vbf_maxpt_j1_bDiscriminatorCSV>0.89","vbf_maxpt_j2_bDiscriminatorCSV>0.89"]; 
 
     
 
@@ -764,7 +778,7 @@ if __name__ == '__main__':
             
             
             tmp_string=["MAKING Cfg File",
-                        "Made CFG File:\t%s"%Cfg_Input_FileName_mm];
+                        "%s"%Cfg_Input_FileName_mm];
             print_boxed_string_File(tmp_string,summaryF_mm);
             Cfg_FileName_Table_mm[CutType_mm][Cut_Number_mm][Sample_Counter_mm]=Cfg_Input_FileName_mm;
             Cfg_FileName_Table_mm[CutType_mm][Cut_Number_mm][Sample_Total_Number_mm+Sample_Counter_mm]=Dir_Data_Saved_mm+"/";
@@ -799,7 +813,7 @@ if __name__ == '__main__':
     print " |                       |"
     print "  -----------------------\n\n"
        
-    TTBar_Scale_Factor_mm=1.0;
+    TTBar_Scale_Factor_mm=Scale_T_Factor_global;
        
     TTBar_Scale_Factor_mm_str=str(TTBar_Scale_Factor_mm);
 
@@ -1025,14 +1039,12 @@ if __name__ == '__main__':
         latex_FrameTitle="Basic Cuts and ONE b-Tagging";
         tmp2_graphics_path=tmp0_graphics_path+"%.0f/"%(Cuts_Total_Number_mm-1);
         Output_Beamer_Latex_File_mm.write("\graphicspath{{/home/matteo/Tesi/"+tmp2_graphics_path+"}}\n");
-        #Output_Beamer_Latex_File_mm.write("\graphicspath{{/home/matteo/Tesi/LxPlus_Matteo/ControlPlots/17gen/TTBarCR_%s/ScaleW%s_ScaleT%s/Consecutive_Cuts_%.0f/}}\n"%(ordering,Scale_W_Factor_global_str,Scale_T_Factor_global_str,(Cuts_Total_Number_mm-1)));
         latex_graph_include(sampleValue[nsample][0],sampleValue[nsample][2],sampleValue[nsample][5],Output_Beamer_Latex_File_mm,latex_FrameSubtitle,latex_FrameTitle,Channel_global);
         
         
         latex_FrameTitle="Basic Cuts and TWO b-Tagging";
         tmp3_graphics_path=tmp0_graphics_path+"%.0f/"%(Cuts_Total_Number_mm);
         Output_Beamer_Latex_File_mm.write("\graphicspath{{/home/matteo/Tesi/"+tmp3_graphics_path+"}}\n");
-        #Output_Beamer_Latex_File_mm.write("\graphicspath{{/home/matteo/Tesi/LxPlus_Matteo/ControlPlots/17gen/TTBarCR_%s/ScaleW%s_ScaleT%s/Consecutive_Cuts_%.0f/}}\n"%(ordering,Scale_W_Factor_global_str,Scale_T_Factor_global_str,(Cuts_Total_Number_mm)));
         latex_graph_include(sampleValue[nsample][0],sampleValue[nsample][2],sampleValue[nsample][5],Output_Beamer_Latex_File_mm,latex_FrameSubtitle,latex_FrameTitle,Channel_global);
         
 

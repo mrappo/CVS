@@ -390,6 +390,13 @@ if __name__ == '__main__':
     pd10 = subprocess.Popen(['mkdir',ControlP_Dir_TTB]);
     pd10.wait();
     
+    ControlP_Dir_TTB_Check=ControlP_Dir_2+"/TTBarCR_Check";
+    #if not os.path.isdir(ControlP_Dir_TTB):
+    pd6 = subprocess.Popen(['mkdir',ControlP_Dir_TTB_Check]);
+    pd6.wait();
+    
+    
+        
     # W+Jets SideBand Directory       
     ControlP_Dir_WJ=ControlP_Dir_2+"/WJetsSB";
     #if not os.path.isdir(ControlP_Dir_WJ):
@@ -401,6 +408,11 @@ if __name__ == '__main__':
     #if not os.path.isdir(ControlP_Dir_SR):
     pd12 = subprocess.Popen(['mkdir',ControlP_Dir_SR]);
     pd12.wait();
+    
+    ControlP_Dir_SR_Sig=ControlP_Dir_2+"/SignalRegion_Significance";
+    #if not os.path.isdir(ControlP_Dir_SR):
+    pd5 = subprocess.Popen(['mkdir',ControlP_Dir_SR_Sig]);
+    pd5.wait();
            
     
     
@@ -592,7 +604,36 @@ if __name__ == '__main__':
     SRCP = subprocess.Popen(['python','MATTEO_SignalRegion_CP.py','--sampleUsed',sampleUsed,'--channel',channel,'--ntuple',ntuple,'--sumFile',summaryF,'--dir',ControlP_Dir_SR,'--inData',InputControlPlotsFileName,'--DEtaCut',DEtaCut_value,'--MjjCut',MjjCut_value,'nJetsCut',nJetsCut_value]);
     SRCP.wait();
     
+    SRCP_Sig = subprocess.Popen(['python','MATTEO_SignalRegion_Significance.py','--sampleUsed',sampleUsed,'--channel',channel,'--ntuple',ntuple,'--sumFile',summaryF,'--dir',ControlP_Dir_SR_Sig,'--inData',InputControlPlotsFileName,'--DEtaCut',DEtaCut_value,'--MjjCut',MjjCut_value,'nJetsCut',nJetsCut_value]);
+    SRCP_Sig.wait();
     
+
+
+
+    #########################################################
+    ######### MAKE TTB Check
+    #########################################################
+    InputTTB_Check_FileName=ControlP_Dir_TTB_Check+"/TTB_Check_input.txt";
+    InputTTB_Check_File=open(InputTTB_Check_FileName,'w+');
+    InputTTB_Check_File.write("%f\n"%b12_epsilon_data);
+    InputTTB_Check_File.write("%f\n"%b21_epsilon_data);
+    InputTTB_Check_File.write("%f\n"%b12_epsilon_mc);
+    InputTTB_Check_File.write("%f\n"%b21_epsilon_mc);
+    
+    InputTTB_Check_File.write("%f\n"%Sigma_b12_epsilon_data);
+    InputTTB_Check_File.write("%f\n"%Sigma_b21_epsilon_data);
+    InputTTB_Check_File.write("%f\n"%Sigma_b12_epsilon_mc);
+    InputTTB_Check_File.write("%f\n"%Sigma_b21_epsilon_mc);    
+    
+    InputTTB_Check_File.write("%f\n"%TTB_True_ScaleFactor);
+    InputTTB_Check_File.write("%f\n"%Sigma_TTB_True_ScaleFactor);
+    
+    InputTTB_Check_File.close();
+    
+    SFTBB_Check = subprocess.Popen(['python','MATTEO_TTB_SF_CheckPlot.py','--sampleUsed',sampleUsed,'--channel',channel,'--ntuple',ntuple,'--sumFile',summaryF,'--dir',ControlP_Dir_2,'--inData',InputTTB_Check_FileName,'--DEtaCut',DEtaCut_value,'--MjjCut',MjjCut_value,'nJetsCut',nJetsCut_value]);
+    SFTBB_Check.wait();
+
+
     
     #########################################################
     ######### PRINT ALL DATA

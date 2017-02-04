@@ -2,7 +2,7 @@ import os,commands
 import sys
 from optparse import OptionParser
 import subprocess
-from MATTEO_Functions import run_log,make_latex_table,print_boxed_string_File,print_lined_string_File,SumSquareRelErrors,replace_latex,latex_graph_include
+from MATTEO_Functions import run_log,make_latex_table,print_boxed_string_File,print_lined_string_File,SumSquareRelErrors,replace_latex,latex_graph_include,GetDataFromFile
 
 
 
@@ -38,6 +38,7 @@ parser.add_option('--sampleUsed', action="store", type="string", dest="sampleUse
 parser.add_option('--DEtaCut', action="store", type="string", dest="DEtaCut", default="0.0")
 parser.add_option('--MjjCut', action="store", type="string", dest="MjjCut", default="0.0")
 parser.add_option('--nJetsCut', action="store", type="string", dest="nJetsCut", default="0.0")
+parser.add_option('--inData', action="store", type="string", dest="inData", default="TTB_Check_input.txt")
 (options, args) = parser.parse_args()
 currentDir = os.getcwd();
 
@@ -64,11 +65,7 @@ Events_type_global=["Wjets_Pythia_Events_g",      # 0
 
 number_Events_type=11;
 
-Scale_W_Factor_global=options.scalewNLO;
 
-Scale_W_Factor_global_str=str(Scale_W_Factor_global);
-
-Scale_T_Factor_global=1.0;
 
 
 
@@ -228,7 +225,7 @@ if (options.channel=="el" or options.channel=="em"):
        
     add_cut_tmp=" && njets>%s && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>%s && vbf_maxpt_jj_m >%s"%(nJetsCut_value,DEtaCut_value,MjjCut_value);
        
-    total_tmp_cut=tmp_cut+add_cut_tmp+"&& vbf_maxpt_j1_bDiscriminatorCSV>0.89";
+    total_tmp_cut=tmp_cut+add_cut_tmp+"&& vbf_maxpt_j1_bDiscriminatorCSV>0.89 && vbf_maxpt_j2_bDiscriminatorCSV>0.89";
     
     cuts_itemize=[total_tmp_cut]; 
        
@@ -240,16 +237,14 @@ if (options.channel=="el" or options.channel=="em"):
 else:
  
     frameSubTitle_AD_string="\hspace{6pt} TTBarCR";
-    
+
     tmp_cut="deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>40 && pfMET>40 && jet_tau2tau1 < 0.6 && (jet_mass_pr > 65 && jet_mass_pr < 105 ) "; 
        
     add_cut_tmp=" && njets>%s && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>%s && vbf_maxpt_jj_m >%s"%(nJetsCut_value,DEtaCut_value,MjjCut_value);
        
-    total_tmp_cut=tmp_cut+add_cut_tmp+"&& vbf_maxpt_j1_bDiscriminatorCSV>0.89";
+    total_tmp_cut=tmp_cut+add_cut_tmp+"&& vbf_maxpt_j1_bDiscriminatorCSV>0.89 && vbf_maxpt_j2_bDiscriminatorCSV>0.89";
     
     cuts_itemize=[total_tmp_cut];
-
-    
 
 
 
@@ -302,6 +297,42 @@ if __name__ == '__main__':
     print "Luminosity:\t%f"%Lumi_mm
     
 
+
+    #########################################################
+    ######### SET INITIAL VALUE
+    #########################################################    
+
+    InFile=options.inData;
+    InputValueVector=GetDataFromFile(InFile);
+    
+    epsilon_12_data=float(InputValueVector[0]);#0.180540;
+    epsilon_21_data=float(InputValueVector[1]);#0.235448;
+    epsilon_12_MC=float(InputValueVector[2]);#0.216463;
+    epsilon_21_MC=float(InputValueVector[3]);#0.305039;
+
+    Sigma_epsilon_12_data=float(InputValueVector[4]);#0.019437;
+    Sigma_epsilon_21_data=float(InputValueVector[5]);#0.025842;
+    Sigma_epsilon_12_MC=float(InputValueVector[6]);#0.021647;
+    Sigma_epsilon_21_MC=float(InputValueVector[7]);#0.030504;
+    
+    Sigma_rel_epsilon_12_data=Sigma_epsilon_12_data/epsilon_12_data;
+    Sigma_rel_epsilon_21_data=Sigma_epsilon_21_data/epsilon_21_data;
+    Sigma_rel_epsilon_12_MC=Sigma_epsilon_12_MC/epsilon_12_MC;
+    Sigma_rel_epsilon_21_MC=Sigma_epsilon_21_MC/epsilon_21_MC;
+    Beta_ScaleFactor_TTBar=float(InputValueVector[8]);#0.886664;
+    Sigma_Beta_ScaleFactor=float(InputValueVector[9]);#0.200185;
+    Sigma_rel_Beta_ScaleFactor=Sigma_Beta_ScaleFactor/Beta_ScaleFactor_TTBar;
+
+    B_Tagging_Correction_Factor=(1-epsilon_12_data)*(1-epsilon_21_data)/((1-epsilon_12_MC)*(1-epsilon_21_MC));
+    Sigma_rel_B_Tagging_Correction_Factor=SumSquareRelErrors([Sigma_rel_epsilon_12_data,Sigma_rel_epsilon_21_data,Sigma_rel_epsilon_12_MC,Sigma_rel_epsilon_21_MC]);
+    
+    Sigma_B_Tagging_Correction_Factor=Sigma_rel_B_Tagging_Correction_Factor*B_Tagging_Correction_Factor;
+    
+    
+    Scale_T_Factor_global=Beta_ScaleFactor_TTBar*B_Tagging_Correction_Factor;
+    Sigma_Scale_T_Factor_global=Scale_T_Factor_global*SumSquareRelErrors([Sigma_rel_B_Tagging_Correction_Factor,Sigma_rel_Beta_ScaleFactor]);
+    
+    
     
     
     
@@ -380,7 +411,7 @@ if __name__ == '__main__':
     #########################################################
     ######### MAKE OUTPUT FILE
     #########################################################    
-    Control_Plots_Dir_mm=ControlP_Dir_2+"/TTBarCR_SF";
+    Control_Plots_Dir_mm=ControlP_Dir_2+"/TTBarCR_Check";
     if not os.path.isdir(Control_Plots_Dir_mm):
        pd8 = subprocess.Popen(['mkdir',Control_Plots_Dir_mm]);
        pd8.wait();
@@ -388,16 +419,21 @@ if __name__ == '__main__':
     
     summaryF_mm = Control_Plots_Dir_mm+"/Summary_ControlPlots.txt";
     Output_Summary_File_mm=open(summaryF_mm,'w+');
-    Output_Summary_File_mm.write("\n\nSUMMARY TTBar Scale Factor\n\n");
+    Output_Summary_File_mm.write("\n\nSUMMARY TTBar Check Plots\n\n");
     Output_Summary_File_mm.close();
     
-    latex_file = Control_Plots_Dir_mm+"/TTBar_ControlPlots.tex";
+    latex_file = Control_Plots_Dir_mm+"/TTBar_CheckPlots.tex";
     Output_Beamer_Latex_File_mm=open(latex_file,'w+');
 
-    # Make Efficiency File
-    ScaleFactorTrue_file = Control_Plots_Dir_mm+"/ScaleFactorTrue.txt";
-    Output_ScaleFactorTrue_File_mm=open(ScaleFactorTrue_file,'w+');
+   
     
+    
+    
+    Scale_W_Factor_global=options.scalewNLO;
+
+    Scale_W_Factor_global_str=str(Scale_W_Factor_global);
+
+    Scale_T_Factor_global=k21_factor*k12_factor*Beta_ScaleFactor_TTBar;
     
     tmp_string=["Sample: %.12s"%(Readed_Values[0][0]),
                 "Mass: %.0f"%int(Readed_Values[0][1]),
@@ -411,10 +447,12 @@ if __name__ == '__main__':
                 " ",
                 "Sigma K21: %f"%Sigma_k21,
                 " ",
-                "SF %f"%float(Readed_Values[0][12])];
+                "SF %f"%float(Readed_Values[0][12]),
+                " ",
+                "True TTB SF: %f"%Beta_ScaleFactor_TTBar,
+                " ",
+                "Total TTB SF: %f"%Scale_T_Factor_global];
     print_boxed_string_File(tmp_string,summaryF_mm);
-    
-    
 
     
     #########################################################
@@ -571,7 +609,7 @@ if __name__ == '__main__':
     Output_VariableList_mm.write("# mass_ungroomedjet_closerjet      30      80     400         M_{top}^{had}\n");
     Output_VariableList_mm.write("# mass_leptonic_closerjet          30      100     400   	    M_{top}^{lep}\n");
     Output_VariableList_mm.write("#jet_tau2tau1                    30       0.1       1.0          #tau_{2}/#tau_{1}\n");
-    '''
+    
     Output_VariableList_mm.write("deltaR_lak8jet                 50        0.1       5          #DeltaR\n");
     Output_VariableList_mm.write("deltaphi_METak8jet             50			-3.14	3.14		#Delta#phi_{met}\n");
     Output_VariableList_mm.write("deltaphi_Vak8jet               50			-3.14	3.14		#Delta#phi_{Wlep}\n");
@@ -591,7 +629,7 @@ if __name__ == '__main__':
     Output_VariableList_mm.write("pfMET							50      0       1000      MET[GeV]\n");
     Output_VariableList_mm.write("v_pt							25			200		700			pT^{W}_{l}_(GeV)\n");
     Output_VariableList_mm.write("l_pt							50			0		1000		pT_{l}_(GeV)\n");
-    '''
+    
     
     
     
@@ -1011,142 +1049,9 @@ if __name__ == '__main__':
         Output_Beamer_Latex_File_mm.write("\graphicspath{{/home/matteo/Tesi/"+tmp0_graphics_path+"}}\n");
         latex_graph_include(sampleValue[nsample][0],sampleValue[nsample][2],sampleValue[nsample][5],Output_Beamer_Latex_File_mm,latex_FrameSubtitle,latex_FrameTitle,Channel_global);
         
-
-
-
-        
-
-        
-        
-        
-        ##################################################################################################################
-        ### CALCOLO True TTBar ScaleFactor e relativa incertezza
-        ##################################################################################################################       
-
-        N_TTBar_mc=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][2];
-        N_STop_mc=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][6];
-        N_WJets_mc=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][0];
-        N_VV_mc=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][4];
-        N_ReadedData=Significance_Table_mm[0][Cuts_Total_Number_mm-1][nsample][number_Events_type+2];
-        N_mc=N_TTBar_mc+N_STop_mc;
-        N_data=N_ReadedData-N_WJets_mc-N_VV_mc;
-        
-        '''
-        Sigma_rel_simulatedMC_WJets=1/TMath.Sqrt(N_simulatedMC_WJets_global);
-        Sigma_rel_simulatedMC_VV=1/TMath.Sqrt(N_simulatedMC_VV_global);
-        Sigma_rel_simulatedMC_TTBar=1/TMath.Sqrt(N_simulatedMC_TTBar_global);
-        Sigma_rel_simulatedMC_STop=1/TMath.Sqrt(N_simulatedMC_STop_global);
-        
-        Sigma_rel_xsec_TTBar_global=0.05;
-        Sigma_rel_xsec_STop_global=0.05;
-        Sigma_rel_xsec_VV_global=0.03;
-        '''
-        Sigma_rel_data=1/TMath.Sqrt(N_ReadedData);
     
-        Sigma_rel_WJets=SumSquareRelErrors([Sigma_rel_simulatedMC_WJets]);
-        Sigma_rel_VV=SumSquareRelErrors([Sigma_rel_simulatedMC_VV,Sigma_rel_xsec_VV_global]);
-        Sigma_rel_TTBar=SumSquareRelErrors([Sigma_rel_simulatedMC_TTBar,Sigma_rel_xsec_TTBar_global]);
-        Sigma_rel_STop=SumSquareRelErrors([Sigma_rel_simulatedMC_STop,Sigma_rel_xsec_STop_global]);
         
-        Sigma_rel_n_data=SumSquareRelErrors([Sigma_rel_data,Sigma_rel_WJets,Sigma_rel_VV]);
-        Sigma_rel_n_mc=SumSquareRelErrors([Sigma_rel_simulatedMC_STop,Sigma_rel_simulatedMC_TTBar]);
-        
-        TTB_ScaleFactor=N_data/N_mc;
-        Sigma_rel_TTB_ScaleFactor=SumSquareRelErrors([Sigma_rel_n_mc,Sigma_rel_n_data]);
-        
-        
-        # In this case we require only ONE b-tagged Jet in order to have more statistic. For this reason we use k and not k^2.
-        # Furthermore we choose as k the mean value between k1 and k2
-        k_factor_global=(k12_factor+k21_factor)/2;
-        Sigma_rel_k=SumSquareRelErrors([(Sigma_k12/k12_factor),(Sigma_k21/k21_factor)]);
-
-        # BETA TTB ScaleFactor is the "pure" TTB scale factor: it not contains the contribution of b-tagging efficiencies
-        beta_ScaleFactor=TTB_ScaleFactor/k_factor_global;
-        Sigma_beta_ScaleFactor=SumSquareRelErrors([Sigma_rel_TTB_ScaleFactor,Sigma_rel_k])*beta_ScaleFactor;
-
-        # Print the result
-        efficence_result_string=["RISULTATI SCALE FACTOR TTBar True (Evaluated in TTBar CR)",
-                          " ",
-                          " ",
-                          "Sample: %s"%sampleValue[nsample][0],
-                          " ",
-                          "Mass: %.0f"%sampleValue[nsample][2],
-                          " ",
-                          " ",
-                          "N MC: %f"%N_mc,
-                          " ",
-                          "N DATA: %f"%N_data,
-                          " ",
-                          " ",
-                          "TTBar ScaleFactor: %f"%TTB_ScaleFactor,
-                          " ",
-                          " ",
-                          "TRUE TTBar ScaleFactor: %f"%beta_ScaleFactor,
-                          " ",
-                          "Sigma TRUE TTBar ScaleFactor: %f"%Sigma_beta_ScaleFactor];
-        
-     
-        print_boxed_string_File(efficence_result_string,summaryF_mm);
-                
-        print_boxed_string_File(efficence_result_string,options.sumFile);
-
-        
-        # Save in the Output_ScaleFactorTrue_File_mm
-        Output_ScaleFactorTrue_File_mm.write("%s"%sampleValue[nsample][0]); 			# 0 SAMPLE
-                          
-        Output_ScaleFactorTrue_File_mm.write("\n%.0f"%sampleValue[nsample][2]); 		# 1 MASS
-
-        Output_ScaleFactorTrue_File_mm.write("\n%f"%N_mc); 								# 2 N_mc
-
-        Output_ScaleFactorTrue_File_mm.write("\n%f"%N_data); 							# 3 N_data
-
-        Output_ScaleFactorTrue_File_mm.write("\n%f"%beta_ScaleFactor); 					# 4 True TTBar ScaleFactor
-
-        Output_ScaleFactorTrue_File_mm.write("\n%f"%Sigma_beta_ScaleFactor); 			# 5 Sigma True TTBar ScaleFactor
-
-        Output_ScaleFactorTrue_File_mm.close();
-        
-        
-        
-        Output_Beamer_Latex_File_mm.write("\n\n\n");
-        Output_Beamer_Latex_File_mm.write("\changefontsizes{9pt}\n");
-        Output_Beamer_Latex_File_mm.write("\\begin{frame}\n");
-        Output_Beamer_Latex_File_mm.write("\\frametitle{Control Plots - True TTBar ScaleFactor }\n");   
-        Output_Beamer_Latex_File_mm.write(latex_FrameSubtitle);
-        #Output_Beamer_Latex_File_mm.write("\changefontsizes{7pt}\n");
-        Output_Beamer_Latex_File_mm.write("\\begin{itemize}\n");
-        Output_Beamer_Latex_File_mm.write("\item Sample:%s\n"%sampleValue[nsample][0]);
-        Output_Beamer_Latex_File_mm.write("\item Mass: %.0f\n"%sampleValue[nsample][2]);
-        
-        Output_Beamer_Latex_File_mm.write("\item $N_{mc}$:%f\n"%N_mc);
-        Output_Beamer_Latex_File_mm.write("\item $N_{data}$:%f\n"%N_data);
-        
-        Output_Beamer_Latex_File_mm.write("\item True TTBar ScaleFactor $SF_{t}=\dfrac{N_{data}}{N_{mc}}$: %f\n"%beta_ScaleFactor);
-        Output_Beamer_Latex_File_mm.write("\item Sigma True TTBar ScaleFactor: %f\n"%Sigma_beta_ScaleFactor);        
-        Output_Beamer_Latex_File_mm.write("\end{itemize}\n");
-        Output_Beamer_Latex_File_mm.write("\n");
-        Output_Beamer_Latex_File_mm.write("\n");
-               
-        Output_Beamer_Latex_File_mm.write("\end{frame}\n");
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+      
         
         
     # Slides with Cuts
