@@ -258,8 +258,12 @@ if (options.channel=="el" or options.channel=="em"):
     frameSubTitle_AD_string="\hspace{6pt} SignalRegion";
     tmp_cut="deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>45 && pfMET>80 && jet_tau2tau1 < 0.6 && (jet_mass_pr > 40 && jet_mass_pr < 150 )"; 
        
-    add_cut_tmp=" && njets>%s && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>%s && vbf_maxpt_jj_m >%s"%(nJetsCut_value,DEtaCut_value,MjjCut_value);
-       
+    if (float((DEtaCut_value) and float(MjjCut_value)):   
+       add_cut_tmp=" && njets>%s && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>%s && vbf_maxpt_jj_m >%s"%(nJetsCut_value,DEtaCut_value,MjjCut_value);
+    else:
+       add_cut_tmp="abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) > 0.001 ";
+
+                           
     total_tmp_cut=tmp_cut+add_cut_tmp+"&& nBTagJet_medium==0 && vbf_maxpt_j1_bDiscriminatorCSV<0.89 && vbf_maxpt_j2_bDiscriminatorCSV<0.89 ";
     cuts_itemize=[total_tmp_cut];
     
@@ -276,7 +280,11 @@ else:
     frameSubTitle_AD_string="\hspace{6pt} SignalRegion";
     tmp_cut="deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>40 && pfMET>40 && jet_tau2tau1 < 0.6 && (jet_mass_pr > 40 && jet_mass_pr < 150 )"; 
        
-    add_cut_tmp=" && njets>%s && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>%s && vbf_maxpt_jj_m >%s"%(nJetsCut_value,DEtaCut_value,MjjCut_value);
+    if (float((DEtaCut_value) and float(MjjCut_value)):   
+       add_cut_tmp=" && njets>%s && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>%s && vbf_maxpt_jj_m >%s"%(nJetsCut_value,DEtaCut_value,MjjCut_value);
+    else:
+       add_cut_tmp="abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) > 0.001 ";
+
        
     total_tmp_cut=tmp_cut+add_cut_tmp+"&& nBTagJet_medium==0 && vbf_maxpt_j1_bDiscriminatorCSV<0.89 && vbf_maxpt_j2_bDiscriminatorCSV<0.89 ";
     cuts_itemize=[total_tmp_cut];

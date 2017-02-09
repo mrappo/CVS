@@ -251,50 +251,99 @@ Cuts For Significance Optimization:
 '''
 
 ####################################
-### EM SAMPLE and e-only sample
+#### CUTS DEFINITION
 ####################################
-if (options.channel=="el" or options.channel=="em"):
-   
-    frameSubTitle_AD_string="\hspace{6pt} SignalRegion";
-    cuts_itemize=["1==1",
-                  "deltaR_lak8jet>(TMath::Pi()/2.0)",
-                  "TMath::Abs(deltaphi_METak8jet)>2.0",
-                  "TMath::Abs(deltaphi_Vak8jet)>2.0",
-                  "v_pt>200","ungroomed_jet_pt>200",
-                  "l_pt>45",
-                  "pfMET>80",
-                  "jet_tau2tau1 < 0.6",
-                  "(jet_mass_pr > 65 && jet_mass_pr < 105 )",
-                  "njets > %s"%(nJetsCut_value),
-                  "abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) > %s"%(DEtaCut_value),
-                  "vbf_maxpt_jj_m > %s"%(MjjCut_value),
-                  "nBTagJet_medium==0 && vbf_maxpt_j1_bDiscriminatorCSV<0.89 && vbf_maxpt_j2_bDiscriminatorCSV<0.89 "];
 
+if (float((DEtaCut_value) and float(MjjCut_value)):
+   
+   
+   ### EM SAMPLE and e-only sample
+   if (options.channel=="el" or options.channel=="em"):
+   
+      frameSubTitle_AD_string="\hspace{6pt} SignalRegion";
+      cuts_itemize=["1==1",
+                    "deltaR_lak8jet>(TMath::Pi()/2.0)",
+                    "TMath::Abs(deltaphi_METak8jet)>2.0",
+                    "TMath::Abs(deltaphi_Vak8jet)>2.0",
+                    "v_pt>200","ungroomed_jet_pt>200",
+                    "l_pt>45",
+                    "pfMET>80",
+                    "jet_tau2tau1 < 0.6",
+                    "(jet_mass_pr > 65 && jet_mass_pr < 105 )",
+                    "nBTagJet_medium==0 && vbf_maxpt_j1_bDiscriminatorCSV<0.89 && vbf_maxpt_j2_bDiscriminatorCSV<0.89 ",
+                    "njets > %s"%(nJetsCut_value),
+                    "abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) > %s"%(DEtaCut_value),
+                    "vbf_maxpt_jj_m > %s"%(MjjCut_value)];
+    
+   else:
+      
+      ### MU SAMPLE
+      frameSubTitle_AD_string="\hspace{6pt} SignalRegion";
+      cuts_itemize=["1==1",
+                    "deltaR_lak8jet>(TMath::Pi()/2.0)",
+                    "TMath::Abs(deltaphi_METak8jet)>2.0",
+                    "TMath::Abs(deltaphi_Vak8jet)>2.0",
+                    "v_pt>200","ungroomed_jet_pt>200",
+                    "l_pt>40",
+                    "pfMET>40",
+                    "jet_tau2tau1 < 0.6",
+                    "(jet_mass_pr > 65 && jet_mass_pr < 105 )",
+                    "nBTagJet_medium==0 && vbf_maxpt_j1_bDiscriminatorCSV<0.89 && vbf_maxpt_j2_bDiscriminatorCSV<0.89 ",
+                    "njets > %s"%(nJetsCut_value),
+                    "abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) > %s"%(DEtaCut_value),
+                    "vbf_maxpt_jj_m > %s"%(MjjCut_value)];
     
 
 
 
 
-##############
-### MU SAMPLE
-##############
-else:
- 
-    frameSubTitle_AD_string="\hspace{6pt} SignalRegion";
-    cuts_itemize=["1==1",
-                  "deltaR_lak8jet>(TMath::Pi()/2.0)",
-                  "TMath::Abs(deltaphi_METak8jet)>2.0",
-                  "TMath::Abs(deltaphi_Vak8jet)>2.0",
-                  "v_pt>200","ungroomed_jet_pt>200",
-                  "l_pt>40",
-                  "pfMET>40",
-                  "jet_tau2tau1 < 0.6",
-                  "(jet_mass_pr > 65 && jet_mass_pr < 105 )",
-                  "njets > %s"%(nJetsCut_value),
-                  "abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) > %s"%(DEtaCut_value),
-                  "vbf_maxpt_jj_m > %s"%(MjjCut_value),
-                  "nBTagJet_medium==0 && vbf_maxpt_j1_bDiscriminatorCSV<0.89 && vbf_maxpt_j2_bDiscriminatorCSV<0.89 "];
 
+
+
+
+
+else:
+   if (options.channel=="el" or options.channel=="em"):
+      
+      
+      ### EM SAMPLE and e-only sample
+      frameSubTitle_AD_string="\hspace{6pt} SignalRegion";
+      cuts_itemize=["1==1",
+                    "deltaR_lak8jet>(TMath::Pi()/2.0)",
+                    "TMath::Abs(deltaphi_METak8jet)>2.0",
+                    "TMath::Abs(deltaphi_Vak8jet)>2.0",
+                    "v_pt>200","ungroomed_jet_pt>200",
+                    "l_pt>45",
+                    "pfMET>80",
+                    "jet_tau2tau1 < 0.6",
+                    "(jet_mass_pr > 65 && jet_mass_pr < 105 )",
+                    "nBTagJet_medium==0 && vbf_maxpt_j1_bDiscriminatorCSV<0.89 && vbf_maxpt_j2_bDiscriminatorCSV<0.89 ",
+                    "abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) > 0.001"];
+#"njets > %s"%(nJetsCut_value),
+#"abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) > %s"%(DEtaCut_value),
+#"vbf_maxpt_jj_m > %s"%(MjjCut_value),
+    
+
+
+   else:
+      
+      ### MU SAMPLE
+      frameSubTitle_AD_string="\hspace{6pt} SignalRegion";
+      cuts_itemize=["1==1",
+                    "deltaR_lak8jet>(TMath::Pi()/2.0)",
+                    "TMath::Abs(deltaphi_METak8jet)>2.0",
+                    "TMath::Abs(deltaphi_Vak8jet)>2.0",
+                    "v_pt>200","ungroomed_jet_pt>200",
+                    "l_pt>40",
+                    "pfMET>40",
+                    "jet_tau2tau1 < 0.6",
+                    "(jet_mass_pr > 65 && jet_mass_pr < 105 )",
+                    "nBTagJet_medium==0 && vbf_maxpt_j1_bDiscriminatorCSV<0.89 && vbf_maxpt_j2_bDiscriminatorCSV<0.89 ",
+                    "abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) > 0.001"];
+
+#"njets > %s"%(nJetsCut_value),
+#"abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) > %s"%(DEtaCut_value),
+#                  "vbf_maxpt_jj_m > %s"%(MjjCut_value),
     
 
 
@@ -563,7 +612,7 @@ if __name__ == '__main__':
     Output_VariableList_mm.write("# mass_ungroomedjet_closerjet      30      80     400         M_{top}^{had}\n");
     Output_VariableList_mm.write("# mass_leptonic_closerjet          30      100     400   	    M_{top}^{lep}\n");
     Output_VariableList_mm.write("#jet_tau2tau1                    30       0.1       1.0          #tau_{2}/#tau_{1}\n");
-    '''
+    
     Output_VariableList_mm.write("deltaR_lak8jet                 50        0.1       5          #DeltaR\n");
     Output_VariableList_mm.write("deltaphi_METak8jet             50			-3.14	3.14		#Delta#phi_{met}\n");
     Output_VariableList_mm.write("deltaphi_Vak8jet               50			-3.14	3.14		#Delta#phi_{Wlep}\n");
@@ -583,7 +632,7 @@ if __name__ == '__main__':
     Output_VariableList_mm.write("pfMET							50      0       1000      MET[GeV]\n");
     Output_VariableList_mm.write("v_pt							25			200		700			pT^{W}_{l}_(GeV)\n");
     Output_VariableList_mm.write("l_pt							50			0		1000		pT_{l}_(GeV)\n");
-    '''
+    
     Output_VariableList_mm.close();
     # Make InputFile and SampleListFile
     Ntuple_mm=options.ntuple;       

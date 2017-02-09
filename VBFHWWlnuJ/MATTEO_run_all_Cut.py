@@ -11,11 +11,12 @@ parser.add_option('--category', action="store",type="string",dest="category",def
 parser.add_option('--type', action="store",type="string",dest="type",default="")
 parser.add_option('--jetalgo', action="store",type="string",dest="jetalgo",default="jet_mass_pr")
 parser.add_option('--interpolate', action="store_true",dest="interpolate",default=False)
-parser.add_option('--batchMode', action="store_true",dest="batchMode",default=False)
+parser.add_option('--batchMode', action="store_true",dest="batchMode",default=True)
 parser.add_option('--vbf', action="store_true",dest="VBF_process",default=True)
 parser.add_option('--pseudodata', action="store_true",dest="pseudodata",default=False)
 parser.add_option('--lumi', action="store",type="float",dest="lumi",default=2300.0)
 parser.add_option('--CrossCuts', action="store_true",dest="CrosCuts",default=True)
+parser.add_option('--NoOutFile', action="store_true",dest="NoOutFile",default=True)
 
 (options, args) = parser.parse_args()
 
@@ -28,10 +29,12 @@ currentDir = os.getcwd();
 samples=["BulkGraviton","Higgs"];
 lumi_str=str("%.0f"%options.lumi);
 ## DeltaEta Cut
-DEta_values=[0.0,1.0,1.5];
+#DEta_values=[0.0,0.25,0.5,0.75,1.0,1.25,1.5,1.75,2.0,2.25,2.5,2.75,3.0];
+DEta_values=[0.5,1.0,1.5,2.0];
    
 # Mjj Cut
-DMjj_values=[0.0,100.0,150.0];
+#DMjj_values=[0.0,25.0,50.0,75.0,100.0,125.0,150.0,175.0,200.0,225.0,250.0,275.0,300.0,325.0];
+DMjj_values=[50.0,100.0,150.0,200.0,250.0];
 
 
 
@@ -455,7 +458,7 @@ if __name__ == '__main__':
            pBM1 = subprocess.Popen(['chmod','777',tmp_run_command]);
            pBM1.wait();
            
-           pBM2 = subprocess.Popen(['bsub','-q','cmscaf1nd','-cwd',currentDir,tmp_run_command]);
+           pBM2 = subprocess.Popen(['bsub','-q','8nm','-cwd',currentDir,tmp_run_command]);
            pBM2.wait();
            
            #os.system("chmod 777 "+currentDir+"/"+fn+".sh");

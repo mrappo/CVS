@@ -33,6 +33,7 @@ parser.add_option('--DEtaCut', action="store", type="float", dest="DEtaCut", def
 parser.add_option('--MjjCut', action="store", type="float", dest="MjjCut", default=0.0)
 parser.add_option('--nJetsCut', action="store", type="float", dest="nJetsCut", default=0.0)
 parser.add_option('--dir', action="store", type="string", dest="dir", default="")
+parser.add_option('--NoOutFile', action="store_true",dest="NoOutFile",default=True)
 
 (options, args) = parser.parse_args()
 
