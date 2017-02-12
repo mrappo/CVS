@@ -11,7 +11,7 @@ parser.add_option('--category', action="store",type="string",dest="category",def
 parser.add_option('--type', action="store",type="string",dest="type",default="")
 parser.add_option('--jetalgo', action="store",type="string",dest="jetalgo",default="jet_mass_pr")
 parser.add_option('--interpolate', action="store_true",dest="interpolate",default=False)
-parser.add_option('--batchMode', action="store_true",dest="batchMode",default=True)
+parser.add_option('--batchMode', action="store_true",dest="batchMode",default=False)
 parser.add_option('--vbf', action="store_true",dest="VBF_process",default=True)
 parser.add_option('--pseudodata', action="store_true",dest="pseudodata",default=False)
 parser.add_option('--lumi', action="store",type="float",dest="lumi",default=2300.0)
@@ -30,11 +30,13 @@ samples=["BulkGraviton","Higgs"];
 lumi_str=str("%.0f"%options.lumi);
 ## DeltaEta Cut
 #DEta_values=[0.0,0.25,0.5,0.75,1.0,1.25,1.5,1.75,2.0,2.25,2.5,2.75,3.0];
-DEta_values=[0.5,1.0,1.5,2.0];
+DEta_values=[0.0];
+#DEta_values=[0.5,1.0,1.5,2.0];
    
 # Mjj Cut
 #DMjj_values=[0.0,25.0,50.0,75.0,100.0,125.0,150.0,175.0,200.0,225.0,250.0,275.0,300.0,325.0];
-DMjj_values=[50.0,100.0,150.0,200.0,250.0];
+DMjj_values=[0.0];
+#DMjj_values=[50.0,100.0,150.0,200.0,250.0];
 
 
 
@@ -447,7 +449,7 @@ if __name__ == '__main__':
            
 
            
-           cmd_tmp = "python MATTEO_run_OneCut_ControlPlots.py --DEtaCut %f --MjjCut %f --nJetsCut %f --dir %s --sampleUsed 1"%(DEta_local,Mjj_local,nJetsCut_value,ControlP_Dir_3);
+           cmd_tmp = "python MATTEO_run_OneCut_ControlPlots.py --DEtaCut %f --MjjCut %f --nJetsCut %f --dir %s --sampleUsed 1 --channel %s"%(DEta_local,Mjj_local,nJetsCut_value,ControlP_Dir_3,options.channel);
            cmd=cmd_tmp+" > "+log_file;
            outScript.write("\n"+cmd);
            #outScript.write("\n"+'rm *.out');
@@ -458,7 +460,7 @@ if __name__ == '__main__':
            pBM1 = subprocess.Popen(['chmod','777',tmp_run_command]);
            pBM1.wait();
            
-           pBM2 = subprocess.Popen(['bsub','-q','8nm','-cwd',currentDir,tmp_run_command]);
+           pBM2 = subprocess.Popen(['bsub','-q','1nh','-cwd',currentDir,tmp_run_command]);
            pBM2.wait();
            
            #os.system("chmod 777 "+currentDir+"/"+fn+".sh");
@@ -471,7 +473,7 @@ if __name__ == '__main__':
            Mjj_local_str=str(Mjj_local);
            nJetsCut_value_str=str(nJetsCut_value);
               
-           pMCP = subprocess.Popen(['python','MATTEO_run_OneCut_ControlPlots.py','--DEtaCut',DEta_local_str,'--MjjCut',Mjj_local_str,'--nJetsCut',nJetsCut_value_str,'--dir',ControlP_Dir_3,'--sampleUsed','1']);
+           pMCP = subprocess.Popen(['python','MATTEO_run_OneCut_ControlPlots.py','--DEtaCut',DEta_local_str,'--MjjCut',Mjj_local_str,'--nJetsCut',nJetsCut_value_str,'--dir',ControlP_Dir_3,'--sampleUsed','1','--channel',options.channel]);
            pMCP.wait();
 
            

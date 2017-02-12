@@ -254,7 +254,7 @@ Cuts For Significance Optimization:
 #### CUTS DEFINITION
 ####################################
 
-if (float((DEtaCut_value) and float(MjjCut_value)):
+if (float(DEtaCut_value) and float(MjjCut_value)):
    
    
    ### EM SAMPLE and e-only sample
@@ -265,7 +265,8 @@ if (float((DEtaCut_value) and float(MjjCut_value)):
                     "deltaR_lak8jet>(TMath::Pi()/2.0)",
                     "TMath::Abs(deltaphi_METak8jet)>2.0",
                     "TMath::Abs(deltaphi_Vak8jet)>2.0",
-                    "v_pt>200","ungroomed_jet_pt>200",
+                    "v_pt>200",
+                    "ungroomed_jet_pt>200",
                     "l_pt>45",
                     "pfMET>80",
                     "jet_tau2tau1 < 0.6",
@@ -283,7 +284,8 @@ if (float((DEtaCut_value) and float(MjjCut_value)):
                     "deltaR_lak8jet>(TMath::Pi()/2.0)",
                     "TMath::Abs(deltaphi_METak8jet)>2.0",
                     "TMath::Abs(deltaphi_Vak8jet)>2.0",
-                    "v_pt>200","ungroomed_jet_pt>200",
+                    "v_pt>200",
+                    "ungroomed_jet_pt>200",
                     "l_pt>40",
                     "pfMET>40",
                     "jet_tau2tau1 < 0.6",
@@ -312,7 +314,8 @@ else:
                     "deltaR_lak8jet>(TMath::Pi()/2.0)",
                     "TMath::Abs(deltaphi_METak8jet)>2.0",
                     "TMath::Abs(deltaphi_Vak8jet)>2.0",
-                    "v_pt>200","ungroomed_jet_pt>200",
+                    "v_pt>200",
+                    "ungroomed_jet_pt>200",
                     "l_pt>45",
                     "pfMET>80",
                     "jet_tau2tau1 < 0.6",
@@ -333,7 +336,8 @@ else:
                     "deltaR_lak8jet>(TMath::Pi()/2.0)",
                     "TMath::Abs(deltaphi_METak8jet)>2.0",
                     "TMath::Abs(deltaphi_Vak8jet)>2.0",
-                    "v_pt>200","ungroomed_jet_pt>200",
+                    "v_pt>200",
+                    "ungroomed_jet_pt>200",
                     "l_pt>40",
                     "pfMET>40",
                     "jet_tau2tau1 < 0.6",
@@ -510,12 +514,12 @@ if __name__ == '__main__':
         cuts_table_main[0][cut_counter]=cut_string1;
         cuts_table_main[1][cut_counter]=cut_string2;
         
-        cuts_file1=Cuts_File_Dir_mm+"/MATTEO_SR_cuts_file1_%s_%s_%s_%s.txt"%(str(Plus_Cut_Counter),DEtaCut_value,MjjCut_value,nJetsCut_value);
+        cuts_file1=Cuts_File_Dir_mm+"/MATTEO_SR_cuts_file1_%s_%s_%s_%s_%s.txt"%(options.channel,str(Plus_Cut_Counter),DEtaCut_value,MjjCut_value,nJetsCut_value);
         output_cuts_file1=open(cuts_file1,'w+');
         output_cuts_file1.write(cut_string1);
         output_cuts_file1.close();
 
-        cuts_file2=Cuts_File_Dir_mm+"/MATTEO_SR_cuts_file2_%s_%s_%s_%s.txt"%(str(Plus_Cut_Counter),DEtaCut_value,MjjCut_value,nJetsCut_value);
+        cuts_file2=Cuts_File_Dir_mm+"/MATTEO_SR_cuts_file2_%s_%s_%s_%s_%s.txt"%(options.channel,str(Plus_Cut_Counter),DEtaCut_value,MjjCut_value,nJetsCut_value);
         output_cuts_file2=open(cuts_file2,'w+');
         output_cuts_file2.write(cut_string2);
         output_cuts_file2.close();
@@ -542,7 +546,7 @@ if __name__ == '__main__':
     
     
     # Make VariableList
-    FileName_VariableList_mm="cfg/DataMCComparison_InputCfgFile/MATTEO_VariableList_SR_%s_%s_%s.txt"%(DEtaCut_value,MjjCut_value,nJetsCut_value);
+    FileName_VariableList_mm="cfg/DataMCComparison_InputCfgFile/MATTEO_VariableList_SR_%s_%s_%s_%s.txt"%(options.channel,DEtaCut_value,MjjCut_value,nJetsCut_value);
     Output_VariableList_mm=open(FileName_VariableList_mm,'w+');
     Output_VariableList_mm.write("############################################################################\n");
     Output_VariableList_mm.write("##  Variable						Nbin		Min		Max			Label\n");

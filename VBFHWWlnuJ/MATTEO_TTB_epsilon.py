@@ -323,10 +323,10 @@ if (options.channel=="el" or options.channel=="em"):
     if options.inverse:
        tmp_cut="deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>45 && pfMET>80 && jet_tau2tau1 < 0.6  && (jet_mass_pr > 65 && jet_mass_pr < 105 )" ;
        
-       if (float((DEtaCut_value) and float(MjjCut_value)):   
+       if (float(DEtaCut_value) and float(MjjCut_value)):   
           add_cut_tmp=" && njets>%s && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>%s && vbf_maxpt_jj_m >%s"%(nJetsCut_value,DEtaCut_value,MjjCut_value);
        else:
-          add_cut_tmp="abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) > 0.001 ";
+          add_cut_tmp="&& abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) > 0.001 ";
 
        
        total_tmp_cut=tmp_cut+add_cut_tmp;
@@ -336,10 +336,10 @@ if (options.channel=="el" or options.channel=="em"):
     else:
        tmp_cut="deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>45 && pfMET>80 && jet_tau2tau1 < 0.6 && (jet_mass_pr > 65 && jet_mass_pr < 105 ) "; 
        
-       if (float((DEtaCut_value) and float(MjjCut_value)):   
+       if (float(DEtaCut_value) and float(MjjCut_value)):   
           add_cut_tmp=" && njets>%s && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>%s && vbf_maxpt_jj_m >%s"%(nJetsCut_value,DEtaCut_value,MjjCut_value);
        else:
-          add_cut_tmp="abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) > 0.001 ";
+          add_cut_tmp="&& abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) > 0.001 ";
        
        total_tmp_cut=tmp_cut+add_cut_tmp;
 
@@ -502,12 +502,12 @@ if __name__ == '__main__':
         cuts_table_main[0][cut_counter]=cut_string1;
         cuts_table_main[1][cut_counter]=cut_string2;
         
-        cuts_file1=Cuts_File_Dir_mm+"/MATTEO_TTBe_cuts_file1_%s_%s_%s_%s_%s.txt"%(str(Plus_Cut_Counter),DEtaCut_value,MjjCut_value,nJetsCut_value,ordering);
+        cuts_file1=Cuts_File_Dir_mm+"/MATTEO_TTBe_cuts_file1_%s_%s_%s_%s_%s_%s.txt"%(options.channel,str(Plus_Cut_Counter),DEtaCut_value,MjjCut_value,nJetsCut_value,ordering);
         output_cuts_file1=open(cuts_file1,'w+');
         output_cuts_file1.write(cut_string1);
         output_cuts_file1.close();
 
-        cuts_file2=Cuts_File_Dir_mm+"/MATTEO_TTBe_cuts_file2_%s_%s_%s_%s_%s.txt"%(str(Plus_Cut_Counter),DEtaCut_value,MjjCut_value,nJetsCut_value,ordering);
+        cuts_file2=Cuts_File_Dir_mm+"/MATTEO_TTBe_cuts_file2_%s_%s_%s_%s_%s_%s.txt"%(options.channel,str(Plus_Cut_Counter),DEtaCut_value,MjjCut_value,nJetsCut_value,ordering);
         output_cuts_file2=open(cuts_file2,'w+');
         output_cuts_file2.write(cut_string2);
         output_cuts_file2.close();
@@ -534,7 +534,7 @@ if __name__ == '__main__':
     
     
     # Make VariableList
-    FileName_VariableList_mm="cfg/DataMCComparison_InputCfgFile/MATTEO_VariableList_TTBe_%s_%s_%s_%s.txt"%(DEtaCut_value,MjjCut_value,nJetsCut_value,ordering);
+    FileName_VariableList_mm="cfg/DataMCComparison_InputCfgFile/MATTEO_VariableList_TTBe_%s_%s_%s_%s_%s.txt"%(options.channel,DEtaCut_value,MjjCut_value,nJetsCut_value,ordering);
     Output_VariableList_mm=open(FileName_VariableList_mm,'w+');
     Output_VariableList_mm.write("############################################################################\n");
     Output_VariableList_mm.write("##  Variable						Nbin		Min		Max			Label\n");
@@ -1081,6 +1081,7 @@ if __name__ == '__main__':
         N_b_data=N_b_ReadedData-N_b_WJets_mc-N_b_VV_mc;
         N_b_mc=N_b_TTBar_mc+N_b_STop_mc;
         
+
         Sigma_rel_n_b_data=SumSquareRelErrors([(1/TMath.Sqrt(N_b_ReadedData)),Sigma_rel_WJets,Sigma_rel_VV]);
         Sigma_rel_n_b_MC=SumSquareRelErrors([Sigma_rel_TTBar,Sigma_rel_STop]);
         
