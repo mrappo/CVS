@@ -612,30 +612,32 @@ if __name__ == '__main__':
     Output_VariableList_mm.write("# ttb_mlvj                          40   400     1400       M_{WW}(GeV/c^{2})\n");
     Output_VariableList_mm.write("# vbf_maxpt_j1_QGLikelihood       50      0       1          j1_QGLikelihood\n");
     Output_VariableList_mm.write("# vbf_maxpt_j2_QGLikelihood       50      0       1          j2_QGLikelihood\n");
-    Output_VariableList_mm.write("abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) 35    0       9     #Delta#eta_{jj}\n");
     Output_VariableList_mm.write("# mass_ungroomedjet_closerjet      30      80     400         M_{top}^{had}\n");
     Output_VariableList_mm.write("# mass_leptonic_closerjet          30      100     400   	    M_{top}^{lep}\n");
     Output_VariableList_mm.write("#jet_tau2tau1                    30       0.1       1.0          #tau_{2}/#tau_{1}\n");
-    
-    Output_VariableList_mm.write("deltaR_lak8jet                 50        0.1       5          #DeltaR\n");
-    Output_VariableList_mm.write("deltaphi_METak8jet             50			-3.14	3.14		#Delta#phi_{met}\n");
-    Output_VariableList_mm.write("deltaphi_Vak8jet               50			-3.14	3.14		#Delta#phi_{Wlep}\n");
     Output_VariableList_mm.write("vbf_maxpt_jj_m                  40      0       1500        M_{jj}_(GeV/c^{2})\n");
-    Output_VariableList_mm.write("#vbf_maxpt_jj_phi                50      -3.14   3.14       #phi_{jj}\n");
-    Output_VariableList_mm.write("vbf_maxpt_jj_eta                30      -4.7       4.7     #eta_{jj}\n");
-    Output_VariableList_mm.write("vbf_maxpt_j2_bDiscriminatorCSV  50      0       1          j2_bDiscriminator\n");
-    Output_VariableList_mm.write("vbf_maxpt_j2_eta                50      -5      5          #eta_{j2}\n");
-    Output_VariableList_mm.write("vbf_maxpt_j2_pt                 50      0       300        pT_{j2}_(GeV)\n");
-    Output_VariableList_mm.write("vbf_maxpt_j1_bDiscriminatorCSV  50      0       1          j1_bDiscriminator\n");
-    Output_VariableList_mm.write("vbf_maxpt_j1_eta                50      -5      5          #eta_{j1}\n");
-    Output_VariableList_mm.write("vbf_maxpt_j1_pt                 50      0       300        pT_{j1}_(GeV)\n");
-    Output_VariableList_mm.write("jet_tau2tau1                     25     0.      1.       #tau_{2}/#tau_{1}\n");
-    Output_VariableList_mm.write("jet_mass_pr						15      65       105     Jet_Pruned_Mass_(GeV/c^{2})\n");
-    Output_VariableList_mm.write("ungroomed_jet_pt				32    100       740      pT^{AK8}_(GeV)\n");
-    Output_VariableList_mm.write("ungroomed_jet_eta				25    -2.5      2.5        #eta^{AK8}\n");
-    Output_VariableList_mm.write("pfMET							50      0       1000      MET[GeV]\n");
-    Output_VariableList_mm.write("v_pt							25			200		700			pT^{W}_{l}_(GeV)\n");
-    Output_VariableList_mm.write("l_pt							50			0		1000		pT_{l}_(GeV)\n");
+    Output_VariableList_mm.write("abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) 35    0       9     #Delta#eta_{jj}\n");
+
+    if not (float(DEtaCut_value)):
+       if not (float(MjjCut_value)):
+           Output_VariableList_mm.write("deltaR_lak8jet                 50        0.1       5          #DeltaR\n");
+           Output_VariableList_mm.write("deltaphi_METak8jet             50			-3.14	3.14		#Delta#phi_{met}\n");
+           Output_VariableList_mm.write("deltaphi_Vak8jet               50			-3.14	3.14		#Delta#phi_{Wlep}\n");
+           Output_VariableList_mm.write("vbf_maxpt_jj_phi                50      -3.14   3.14       #phi_{jj}\n");
+           Output_VariableList_mm.write("vbf_maxpt_jj_eta                30      -4.7       4.7     #eta_{jj}\n");
+           Output_VariableList_mm.write("vbf_maxpt_j2_bDiscriminatorCSV  50      0       1          j2_bDiscriminator\n");
+           Output_VariableList_mm.write("vbf_maxpt_j2_eta                50      -5      5          #eta_{j2}\n");
+           Output_VariableList_mm.write("vbf_maxpt_j2_pt                 50      0       300        pT_{j2}_(GeV)\n");
+           Output_VariableList_mm.write("vbf_maxpt_j1_bDiscriminatorCSV  50      0       1          j1_bDiscriminator\n");
+           Output_VariableList_mm.write("vbf_maxpt_j1_eta                50      -5      5          #eta_{j1}\n");
+           Output_VariableList_mm.write("vbf_maxpt_j1_pt                 50      0       300        pT_{j1}_(GeV)\n");
+           Output_VariableList_mm.write("jet_tau2tau1                     25     0.      1.       #tau_{2}/#tau_{1}\n");
+           Output_VariableList_mm.write("jet_mass_pr						15      65       105     Jet_Pruned_Mass_(GeV/c^{2})\n");
+           Output_VariableList_mm.write("ungroomed_jet_pt				32    100       740      pT^{AK8}_(GeV)\n");
+           Output_VariableList_mm.write("ungroomed_jet_eta				25    -2.5      2.5        #eta^{AK8}\n");
+           Output_VariableList_mm.write("pfMET							50      0       1000      MET[GeV]\n");
+           Output_VariableList_mm.write("v_pt							25			200		700			pT^{W}_{l}_(GeV)\n");
+           Output_VariableList_mm.write("l_pt							50			0		1000		pT_{l}_(GeV)\n");
     
     Output_VariableList_mm.close();
     # Make InputFile and SampleListFile
