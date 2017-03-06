@@ -314,6 +314,7 @@ else:
                     "deltaR_lak8jet>(TMath::Pi()/2.0)",
                     "TMath::Abs(deltaphi_METak8jet)>2.0",
                     "TMath::Abs(deltaphi_Vak8jet)>2.0",
+                    "mass_lvj_type2>600 && mass_lvj_type2<2000",
                     "v_pt>200",
                     "ungroomed_jet_pt>200",
                     "l_pt>45",

@@ -256,15 +256,15 @@ Cuts For Significance Optimization:
 if (options.channel=="el" or options.channel=="em"):
    
     frameSubTitle_AD_string="\hspace{6pt} SignalRegion";
-    tmp_cut="deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>45 && pfMET>80 && jet_tau2tau1 < 0.6 && (jet_mass_pr > 40 && jet_mass_pr < 150 )"; 
+    tmp_cut="deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>45 && pfMET>80 && jet_tau2tau1 < 0.6 && (jet_mass_pr > 40 && jet_mass_pr < 150 ) && (mass_lvj_type2>600 && mass_lvj_type2<2000) "; 
        
     if (float(DEtaCut_value) and float(MjjCut_value)):   
-       add_cut_tmp=" && njets>%s && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>%s && vbf_maxpt_jj_m >%s"%(nJetsCut_value,DEtaCut_value,MjjCut_value);
+       add_cut_tmp=" && njets>%s && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>%s && vbf_maxpt_jj_m >%s "%(nJetsCut_value,DEtaCut_value,MjjCut_value);
     else:
-       add_cut_tmp="&& abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) > 0.001 ";
+       add_cut_tmp=" && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) > 0.001 ";
 
                            
-    total_tmp_cut=tmp_cut+add_cut_tmp+"&& nBTagJet_medium==0 && vbf_maxpt_j1_bDiscriminatorCSV<0.89 && vbf_maxpt_j2_bDiscriminatorCSV<0.89 ";
+    total_tmp_cut=tmp_cut+add_cut_tmp+" && nBTagJet_medium==0 && vbf_maxpt_j1_bDiscriminatorCSV<0.89 && vbf_maxpt_j2_bDiscriminatorCSV<0.89 ";
     cuts_itemize=[total_tmp_cut];
     
 
@@ -278,15 +278,15 @@ if (options.channel=="el" or options.channel=="em"):
 else:
  
     frameSubTitle_AD_string="\hspace{6pt} SignalRegion";
-    tmp_cut="deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>40 && pfMET>40 && jet_tau2tau1 < 0.6 && (jet_mass_pr > 40 && jet_mass_pr < 150 )"; 
+    tmp_cut="deltaR_lak8jet>(TMath::Pi()/2.0) && TMath::Abs(deltaphi_METak8jet)>2.0 && TMath::Abs(deltaphi_Vak8jet)>2.0 && v_pt>200 && ungroomed_jet_pt>200 && l_pt>40 && pfMET>40 && jet_tau2tau1 < 0.6 && (jet_mass_pr > 40 && jet_mass_pr < 150 ) && (mass_lvj_type2>600 && mass_lvj_type2<2000) "; 
        
     if (float(DEtaCut_value) and float(MjjCut_value)):   
-       add_cut_tmp=" && njets>%s && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>%s && vbf_maxpt_jj_m >%s"%(nJetsCut_value,DEtaCut_value,MjjCut_value);
+       add_cut_tmp=" && njets>%s && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta)>%s && vbf_maxpt_jj_m >%s "%(nJetsCut_value,DEtaCut_value,MjjCut_value);
     else:
-       add_cut_tmp="&& abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) > 0.001 ";
+       add_cut_tmp=" && abs(vbf_maxpt_j1_eta-vbf_maxpt_j2_eta) > 0.001 ";
 
        
-    total_tmp_cut=tmp_cut+add_cut_tmp+"&& nBTagJet_medium==0 && vbf_maxpt_j1_bDiscriminatorCSV<0.89 && vbf_maxpt_j2_bDiscriminatorCSV<0.89 ";
+    total_tmp_cut=tmp_cut+add_cut_tmp+" && nBTagJet_medium==0 && vbf_maxpt_j1_bDiscriminatorCSV<0.89 && vbf_maxpt_j2_bDiscriminatorCSV<0.89 ";
     cuts_itemize=[total_tmp_cut];
 
     
@@ -571,7 +571,7 @@ if __name__ == '__main__':
     Output_VariableList_mm.write("vbf_maxpt_j1_eta                50      -5      5          #eta_{j1}\n");
     Output_VariableList_mm.write("vbf_maxpt_j1_pt                 50      0       300        pT_{j1}_(GeV)\n");
     Output_VariableList_mm.write("jet_tau2tau1                     25     0.      1.       #tau_{2}/#tau_{1}\n");
-    Output_VariableList_mm.write("jet_mass_pr						15      65       105     Jet_Pruned_Mass_(GeV/c^{2})\n");
+    Output_VariableList_mm.write("jet_mass_pr						19      40       150     Jet_Pruned_Mass_(GeV/c^{2})\n");
     Output_VariableList_mm.write("ungroomed_jet_pt				32    100       740      pT^{AK8}_(GeV)\n");
     Output_VariableList_mm.write("ungroomed_jet_eta				25    -2.5      2.5        #eta^{AK8}\n");
     Output_VariableList_mm.write("pfMET							50      0       1000      MET[GeV]\n");
