@@ -469,7 +469,7 @@ if __name__ == '__main__':
     E12 = subprocess.Popen(['python','MATTEO_TTB_epsilon.py','--sampleUsed',sampleUsed,'--channel',channel,'--ntuple',ntuple,'--sumFile',summaryF,'--dir',ControlP_Dir_T12,'--DEtaCut',DEtaCut_value,'--MjjCut',MjjCut_value,'nJetsCut',nJetsCut_value]); 
     E12.wait();
 
-    E21 = subprocess.Popen(['python','MATTEO_TTB_epsilon.py','--inverse','--sampleUsed',sampleUsed,'--channel',channel,'--ntuple',ntuple,'--sumFile',summaryF,'--dir',ControlP_Dir_T21,'--DEtaCut',DEtaCut_value,'--MjjCut',MjjCut_value,'nJetsCut',nJetsCut_value]);
+    E21 = subprocess.Popen(['python','MATTEO_TTB_epsilon.py','--inverse','--sampleUsed',sampleUsed,'--channel',channel,'--ntuple',ntuple,'--sumFile',summaryF,'--dir',ControlP_Dir_T21,'--DEtaCut',DEtaCut_value,'--MjjCut',MjjCut_value,'--nJetsCut',nJetsCut_value]);
     E21.wait();
     
     # Save in the Output_Efficiency_File_mm -> /TTBarCR_12/ScaleW1.21ScaleT1.0/Efficiency.txt
@@ -509,7 +509,7 @@ if __name__ == '__main__':
     ######### GET THE CORRECT TTBAR SCALE FACTOR
     #########################################################
 
-    SFTTB = subprocess.Popen(['python','MATTEO_TTB_SF.py','--sampleUsed',sampleUsed,'--channel',channel,'--ntuple',ntuple,'--sumFile',summaryF,'--dir',ControlP_Dir_2,'--DEtaCut',DEtaCut_value,'--MjjCut',MjjCut_value,'nJetsCut',nJetsCut_value]);
+    SFTTB = subprocess.Popen(['python','MATTEO_TTB_SF.py','--sampleUsed',sampleUsed,'--channel',channel,'--ntuple',ntuple,'--sumFile',summaryF,'--dir',ControlP_Dir_2,'--DEtaCut',DEtaCut_value,'--MjjCut',MjjCut_value,'--nJetsCut',nJetsCut_value]);
     SFTTB.wait();
 
     # Save in the Output_ScaleFactorTrue_File_mm -> /TTBarCR/ScaleFactorTrue.txt
@@ -550,7 +550,7 @@ if __name__ == '__main__':
     
     InputWJetsFile.close();
     
-    SFWJ = subprocess.Popen(['python','MATTEO_WJets_SF.py','--sampleUsed',sampleUsed,'--channel',channel,'--ntuple',ntuple,'--sumFile',summaryF,'--dir',ControlP_Dir_WJ,'--inData',InputWJetsFileName,'--DEtaCut',DEtaCut_value,'--MjjCut',MjjCut_value,'nJetsCut',nJetsCut_value]);
+    SFWJ = subprocess.Popen(['python','MATTEO_WJets_SF.py','--sampleUsed',sampleUsed,'--channel',channel,'--ntuple',ntuple,'--sumFile',summaryF,'--dir',ControlP_Dir_WJ,'--inData',InputWJetsFileName,'--DEtaCut',DEtaCut_value,'--MjjCut',MjjCut_value,'--nJetsCut',nJetsCut_value]);
     SFWJ.wait();
 
 
@@ -602,10 +602,10 @@ if __name__ == '__main__':
     
     InputControlPlotsFile.close();
     
-    SRCP = subprocess.Popen(['python','MATTEO_SignalRegion_CP.py','--sampleUsed',sampleUsed,'--channel',channel,'--ntuple',ntuple,'--sumFile',summaryF,'--dir',ControlP_Dir_SR,'--inData',InputControlPlotsFileName,'--DEtaCut',DEtaCut_value,'--MjjCut',MjjCut_value,'nJetsCut',nJetsCut_value]);
+    SRCP = subprocess.Popen(['python','MATTEO_SignalRegion_CP.py','--sampleUsed',sampleUsed,'--channel',channel,'--ntuple',ntuple,'--sumFile',summaryF,'--dir',ControlP_Dir_SR,'--inData',InputControlPlotsFileName,'--DEtaCut',DEtaCut_value,'--MjjCut',MjjCut_value,'--nJetsCut',nJetsCut_value]);
     SRCP.wait();
     
-    SRCP_Sig = subprocess.Popen(['python','MATTEO_SignalRegion_Significance.py','--sampleUsed',sampleUsed,'--channel',channel,'--ntuple',ntuple,'--sumFile',summaryF,'--dir',ControlP_Dir_SR_Sig,'--inData',InputControlPlotsFileName,'--DEtaCut',DEtaCut_value,'--MjjCut',MjjCut_value,'nJetsCut',nJetsCut_value]);
+    SRCP_Sig = subprocess.Popen(['python','MATTEO_SignalRegion_Significance.py','--sampleUsed',sampleUsed,'--channel',channel,'--ntuple',ntuple,'--sumFile',summaryF,'--dir',ControlP_Dir_SR_Sig,'--inData',InputControlPlotsFileName,'--DEtaCut',DEtaCut_value,'--MjjCut',MjjCut_value,'--nJetsCut',nJetsCut_value]);
     SRCP_Sig.wait();
     
 
@@ -631,7 +631,7 @@ if __name__ == '__main__':
     
     InputTTB_Check_File.close();
     
-    SFTBB_Check = subprocess.Popen(['python','MATTEO_TTB_SF_CheckPlot.py','--sampleUsed',sampleUsed,'--channel',channel,'--ntuple',ntuple,'--sumFile',summaryF,'--dir',ControlP_Dir_2,'--inData',InputTTB_Check_FileName,'--DEtaCut',DEtaCut_value,'--MjjCut',MjjCut_value,'nJetsCut',nJetsCut_value]);
+    SFTBB_Check = subprocess.Popen(['python','MATTEO_TTB_SF_CheckPlot.py','--sampleUsed',sampleUsed,'--channel',channel,'--ntuple',ntuple,'--sumFile',summaryF,'--dir',ControlP_Dir_2,'--inData',InputTTB_Check_FileName,'--DEtaCut',DEtaCut_value,'--MjjCut',MjjCut_value,'--nJetsCut',nJetsCut_value]);
     SFTBB_Check.wait();
 
 
